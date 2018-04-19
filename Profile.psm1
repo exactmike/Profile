@@ -1185,3 +1185,15 @@ function Get-RandomPassword
     (1..$(Get-Random -Minimum $MinimumLength -Maximum $MaximumLength) | ForEach-Object {$ArrayOfChars | Get-Random}) -join ''
 }
 #end function Get-RandomPassword
+##########################################################################################################
+#Import functions from included ps1 files
+##########################################################################################################
+#. $(Join-Path $PSScriptRoot 'ProfileWizardFunctions.ps1')
+. $(Join-Path $PSScriptRoot 'UtilityFunctions.ps1')
+. $(Join-Path $PSScriptRoot 'UserInputFunctions.ps1')
+. $(Join-Path $PSScriptRoot 'ProgrammingUtilityFunctions.ps1')
+. $(Join-Path $PSScriptRoot 'TestFunctions.ps1')
+. $(Join-Path $PSScriptRoot 'AzureADFunctions.ps1')
+. $(Join-Path $PSScriptRoot 'ExchangeFunctions.ps1')
+. $(Join-Path $PSScriptRoot 'ActiveDirectoryFunctions.ps1')
+. $(Join-Path $PSScriptRoot 'AADSyncFunctions.ps1')
