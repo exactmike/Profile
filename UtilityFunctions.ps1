@@ -185,6 +185,7 @@ function New-Timer
             PercentComplete  = 0
             CurrentOperation = 'Starting'
             SecondsRemaining = $timespan.TotalSeconds
+            Id               = 2147483646
         }
         Write-Progress @writeprogressparams
     }
