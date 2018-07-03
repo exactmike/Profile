@@ -15,7 +15,6 @@ Function Update-GitSourcedModules
     Push-Location
     Set-Location -LiteralPath $path
     $childDirectories = Get-ChildItem -Directory
-    $cd = $childDirectories[0]
     foreach ($cd in $childDirectories)
     {
         Set-Location -LiteralPath $cd.FullName
@@ -26,11 +25,17 @@ Function Update-GitSourcedModules
             Write-Verbose -Message $Message
             git fetch
             $GitStatus = Get-GitStatus
-            if ($GitStatus.AheadBy -eq 0 -and $GitStatus.BehindBy -gt 0)
+            if ($GitStatus.BehindBy -gt 0)
             {
                 $Message = "Pull $($cd.PSChildName) for $($GitStatus.Branch) from $($GitStatus.Upstream)"
                 Write-Verbose -Message $Message
                 git pull
+            }
+            if ($GitStatus.AheadBy -gt 0)
+            {
+                $Message = "Push $($cd.PSChildName) for $($GitStatus.Branch) to $($GitStatus.Upstream)"
+                Write-Verbose -Message $Message
+                git push
             }
         }
     }
