@@ -25,18 +25,30 @@ Function Update-GitSourcedModules
             Write-Verbose -Message $Message
             git fetch
             $GitStatus = Get-GitStatus
-            if ($GitStatus.BehindBy -gt 0)
+            switch ($GitStatus.HasWorking)
             {
-                $Message = "Pull $($cd.PSChildName) for $($GitStatus.Branch) from $($GitStatus.Upstream)"
-                Write-Verbose -Message $Message
-                git pull
+                $true
+                {
+                    $Message = "$($cd.PSChildName) has $($gitStatus.Working.Count) file(s) with local uncommitted changes: $($GitStatus.Working -join ', ')"
+                    Write-Warning -Message $Message
+                }
+                $false
+                {
+                    if ($GitStatus.BehindBy -gt 0)
+                    {
+                        $Message = "Pull $($cd.PSChildName) for $($GitStatus.Branch) from $($GitStatus.Upstream)"
+                        Write-Verbose -Message $Message
+                        git pull
+                    }
+                    if ($GitStatus.AheadBy -gt 0)
+                    {
+                        $Message = "Push $($cd.PSChildName) for $($GitStatus.Branch) to $($GitStatus.Upstream)"
+                        Write-Verbose -Message $Message
+                        git push
+                    }
+                }
             }
-            if ($GitStatus.AheadBy -gt 0)
-            {
-                $Message = "Push $($cd.PSChildName) for $($GitStatus.Branch) to $($GitStatus.Upstream)"
-                Write-Verbose -Message $Message
-                git push
-            }
+
         }
     }
     Pop-Location
