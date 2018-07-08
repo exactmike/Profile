@@ -568,3 +568,24 @@ function Export-Credential
     $exportCredential
 }
 #end function Export-Credential
+
+function Show-One
+{
+    [cmdletbinding()]
+    param
+    (
+        [parameter(ValueFromPipeline)]
+        [psobject[]]$Input
+        ,
+        [switch]$ClearHost
+    )
+    process
+    {
+        foreach ($i in $input)
+        {
+            if ($true -eq $clearhost) {Clear-Host}
+            $i | Format-List * -force
+            Read-Host
+        }
+    }
+}
