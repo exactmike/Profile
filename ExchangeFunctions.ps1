@@ -56,7 +56,7 @@ function Get-RecipientCmdlet
         $verb
         ,
         [parameter(ParameterSetName = 'IdentityString')]
-        $ExchangeOrganization
+        $ExchangeSession
     )
     switch ($PSCmdlet.ParameterSetName)
     {
@@ -67,7 +67,7 @@ function Get-RecipientCmdlet
         'IdentityString'
         {
             #get the recipient object
-            $Recipient = Invoke-ExchangeCommand -cmdlet 'Get-Recipient' -string "-Identity $Identity" -ExchangeOrganization $ExchangeOrganization
+            $Recipient = Invoke-Command -Session $ExchangeSession -ScriptBlock {Get-Recipient -Identity $using:Identity -ErrorAction Stop} -ErrorAction Stop
         }
     }#switch ParameterSetName
     #Return the cmdlet based on recipient type and requested verb
@@ -249,29 +249,12 @@ Function Test-ExchangeAlias
         ,
         [string[]]$ExemptObjectGUIDs
         ,
-        [switch]$RefreshAliasData
-        ,
         [switch]$ReturnConflicts
         ,
         [parameter(Mandatory = $true)]
         [System.Management.Automation.Runspaces.PSSession]$ExchangeSession
     )
-    #Populate the TestExchangeAlias Hash Table if needed
-    <#
-            if (Test-Path -Path variable:Script:TestExchangeAlias)
-            {
-                if ($RefreshAliasData)
-                {
-                    Write-Log -message 'Running New-TestExchangeAlias'
-                    New-TestExchangeAlias -ExchangeSession $ExchangeSession
-                }
-            }
-            else
-            {
-                Write-Log -message 'Running New-TestExchangeAlias'
-                New-TestExchangeAlias -ExchangeSession $ExchangeSession
-            }
-        #>
+
     #Test the Alias
     $ReturnedObjects = @(
         try
@@ -383,8 +366,6 @@ Function Test-ExchangeProxyAddress
         [string]$ProxyAddress
         ,
         [string[]]$ExemptObjectGUIDs
-        ,
-        [switch]$RefreshProxyAddressData
         ,
         [switch]$ReturnConflicts
         ,
