@@ -605,17 +605,17 @@ function Get-UNCPath {
             Push-Location
             Set-Location -Path $ContainerPath
             $loc = Get-Location
-            if ($null -eq $loc.Drive) {$loc.ProviderPath} 
+            if ($null -eq $loc.Drive) {$loc.ProviderPath}
             else {
                 switch ($null -eq $loc.Drive.DisplayRoot)
                 {
-                    $true #not a network mapped drive - is local.  Might not work for drives mapped to a local subdirectory? need to test and revise if not
+                    $true #not a network mapped drive - is local drive.
                     {
                         Join-Path -path (Join-Path -Path $('\\' + [System.Environment]::MachineName) -ChildPath $($loc.Drive.Name + '$')) -ChildPath $loc.Drive.CurrentLocation
                     }
                     $false #is a network mapped drive
                     {
-                        Join-Path -Path $loc.Drive.DisplayRoot -ChildPath $loc.Drive.CurrentLocation   
+                        Join-Path -Path $loc.Drive.DisplayRoot -ChildPath $loc.Drive.CurrentLocation
                     }
                 }
             }
@@ -639,6 +639,5 @@ function Get-UNCPath {
                 }
             }
         }
-    }    
+    }
 }
-
