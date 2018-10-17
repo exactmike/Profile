@@ -574,17 +574,24 @@ function Show-One
     param
     (
         [parameter(ValueFromPipeline)]
-        [psobject[]]$Input
+        [psobject[]]$PSObject
         ,
         [switch]$ClearHost
     )
     process
     {
-        foreach ($i in $input)
+        foreach ($o in $PSObject)
         {
-            if ($true -eq $clearhost) {Clear-Host}
-            $i | Format-List * -force
-            Read-Host
+            if ($true -eq $quit)
+            {
+                break
+            }
+            if ($true -eq $Clearhost) {Clear-Host}
+            $o | Format-List -Property * -Force
+            if ($(Read-Host -Prompt "Show next object (any key), or quit (q)?") -eq 'q')
+            {
+                $quit = $true
+            }
         }
     }
 }
