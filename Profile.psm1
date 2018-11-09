@@ -6,22 +6,64 @@
     $rs = $rm.GetResourceSet((Get-Culture), $true, $true)
     $rs | where Name -match 'Shortcut\d?$|^F\d+Keyboard'
 }
-Function Update-GitSourcedModules
+Function Get-GitSourcedModule
 {
     [cmdletbinding()]
     param(
-        $path = $MyModulesPath
+        $path = $(pwd).path
+        ,
+        [switch]$Recurse
     )
     Push-Location
-    Set-Location -LiteralPath $path
-    $childDirectories = Get-ChildItem -Directory
-    foreach ($cd in $childDirectories)
+    Set-Location -Path $path
+    if ($true -eq $Recurse)
     {
-        Set-Location -LiteralPath $cd.FullName
+        $ChildDirectories = Get-ChildItem -Directory
+        foreach ($cd in $ChildDirectories)
+        {
+            Set-Location -LiteralPath $cd.FullName
+            $GitStatus = Get-GitStatus
+            if ($GitStatus -ne $null)
+            {
+                $cd.FullName
+            }
+        }
+    }
+    else
+    {
         $GitStatus = Get-GitStatus
         if ($GitStatus -ne $null)
         {
-            $Message = "Fetching $($cd.PSChildName) from $($GitStatus.Upstream)"
+            $(pwd).path
+        }
+    }
+    Pop-Location
+}
+Function Update-GitSourcedModule
+{
+    [cmdletbinding()]
+    param(
+        $path = $(pwd).path
+        ,
+        [switch]$Recurse
+    )
+    $GetGitSourcedModuleParams = @{
+        path = $path
+    }
+    if ($true -eq $Recurse)
+    {
+        $GetGitSourcedModuleParams.Recurse = $true
+    }
+    $GitSourcedModules = @(Get-GitSourcedModule @GetGitSourcedModuleParams)
+    if ($GitSourcedModules.Count -ge 1)
+    {
+        Push-Location
+        foreach ($gsm in $GitSourcedModules)
+        {
+            Set-Location -LiteralPath $gsm
+            $GitStatus = Get-GitStatus
+            $Name = Split-Path -Leaf -Path $gsm
+            $Message = "Fetching $Name from $($GitStatus.Upstream)"
             Write-Verbose -Message $Message
             git fetch
             $GitStatus = Get-GitStatus
@@ -48,10 +90,9 @@ Function Update-GitSourcedModules
                     }
                 }
             }
-
         }
+        Pop-Location
     }
-    Pop-Location
 }
 function Set-HostColor
 {
