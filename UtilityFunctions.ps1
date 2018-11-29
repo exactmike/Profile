@@ -627,3 +627,7 @@ function Get-UNCPath {
         }
     }
 }
+function Get-PSModulePath
+{
+    $env:PSModulePath.split(';')
+}
