@@ -991,3 +991,4 @@ function Get-RandomPassword
 . $(Join-Path $PSScriptRoot 'AADSyncFunctions.ps1')
 . $(Join-Path $PSScriptRoot 'ParameterFunctions.ps1')
 . $(Join-Path $PSScriptRoot 'PackageAndProfileManagementFunctions.ps1')
+. $(Join-Path $PSScriptRoot 'SystemConfigurationFunctions.ps1')
