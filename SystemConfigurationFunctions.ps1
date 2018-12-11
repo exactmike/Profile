@@ -6,5 +6,5 @@ function Set-VirtualizationNetAdapterToPrivate
         $InterfaceAliasPrefix = 'vEthernet'
     )
     $MatchingConnectionProfiles = @(Get-NetConnectionProfile -InterfaceAlias "$InterfaceAliasPrefix*" -Name $Name)
-    $MatchingConnectionProfiles | Where-Object {$_.IPv4Connectivity -eq 'NoTraffic' -and $_.IPv6Connectivity -eq 'NoTraffic'} | Set-NetConnectionProfile -NetworkCategory Private -WhatIf
+    $MatchingConnectionProfiles | Where-Object {$_.IPv4Connectivity -eq 'NoTraffic' -and $_.IPv6Connectivity -eq 'NoTraffic'} | Set-NetConnectionProfile -NetworkCategory Private
 }
