@@ -1,18 +1,20 @@
 function Get-UninstallEntry
 {
-  [cmdletbinding(DefaultParameterSetName = 'SpecifiedProperties')]
-  param(
-    [parameter(ParameterSetName = 'Raw')]
-    [switch]$raw
-    ,
-    [parameter(ParameterSetName = 'SpecifiedProperties')]
-    [string[]]$property = @('DisplayName','DisplayVersion','InstallDate','Publisher')
-  )
+    [cmdletbinding(DefaultParameterSetName = 'SpecifiedProperties')]
+    param(
+        [parameter(ParameterSetName = 'Raw')]
+        [switch]$raw
+        ,
+        [parameter(ParameterSetName = 'SpecifiedProperties')]
+        [string[]]$property = @('DisplayName', 'DisplayVersion', 'InstallDate', 'Publisher')
+    )
     # paths: x86 and x64 registry keys are different
-    if ([IntPtr]::Size -eq 4) {
+    if ([IntPtr]::Size -eq 4)
+    {
         $path = 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*'
     }
-    else {
+    else
+    {
         $path = @(
             'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*'
             'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
@@ -26,7 +28,8 @@ function Get-UninstallEntry
     # and finally sort by name
     #Sort-Object DisplayName
     if ($raw) {$UninstallEntries | Sort-Object -Property DisplayName}
-    else {
+    else
+    {
         $UninstallEntries | Sort-Object -Property DisplayName | Select-Object -Property $property
     }
 }
@@ -123,7 +126,7 @@ function Get-AvailableModuleInstallationStatus
 {
     [CmdletBinding(DefaultParameterSetName = 'All')]
     param(
-        [parameter(ValueFromPipeline,ValueFromPipelineByPropertyName,ParameterSetName = 'Named')]
+        [parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'Named', Position = 1)]
         [string[]]$Name
     )
     begin
@@ -167,13 +170,13 @@ function Get-AvailableModuleInstallationStatus
             {
                 #Iterate through available modules
                 $ModuleVersionStatus = [PSCustomObject]@{
-                    Name = $am.Name
-                    Version = $am.Version
-                    PowerShellGet = $null
-                    LatestVersion = $null
+                    Name            = $am.Name
+                    Version         = $am.Version
+                    PowerShellGet   = $null
+                    LatestVersion   = $null
                     UpdateAvailable = $null
-                    Location = Split-Path -Path $am.ModuleBase -Parent
-                    Guid = $am.Guid.guid
+                    Location        = Split-Path -Path $am.ModuleBase -Parent
+                    Guid            = $am.Guid.guid
                 }
                 switch ($PowerShellGetModulesLookup.ContainsKey($am.Name))
                 {
@@ -216,14 +219,14 @@ function Get-AvailableModuleInstallationStatus
                 $true
                 {
                     [PSCustomObject]@{
-                        Name = $g.Name
+                        Name                   = $g.Name
                         LatestVersionInstalled = $g.group.Version | Sort-Object -Descending | Select-Object -First 1
-                        InstalledVersions = @($g.group.Version | Sort-Object -Descending -Unique)
-                        PowerShellGet = if ($g.group.PowerShellGet -contains $true) {$true} else {$false}
-                        LatestVersion = $g.group.LatestVersion | Sort-Object -Descending | Select-Object -First 1
-                        UpdateAvailable = if ($g.group.UpdateAvailable -contains $false) {$false} else {$true}
-                        Location = @($g.group.Location | Select-Object -Unique)
-                        Guid = @($g.group.Guid | Select-Object -Unique)
+                        InstalledVersions      = @($g.group.Version | Sort-Object -Descending -Unique)
+                        PowerShellGet          = if ($g.group.PowerShellGet -contains $true) {$true} else {$false}
+                        LatestVersion          = $g.group.LatestVersion | Sort-Object -Descending | Select-Object -First 1
+                        UpdateAvailable        = if ($g.group.UpdateAvailable -contains $false) {$false} else {$true}
+                        Location               = @($g.group.Location | Select-Object -Unique)
+                        Guid                   = @($g.group.Guid | Select-Object -Unique)
                     }
 
 
@@ -231,14 +234,14 @@ function Get-AvailableModuleInstallationStatus
                 $false
                 {
                     [PSCustomObject]@{
-                        Name = $g.Name
+                        Name                   = $g.Name
                         LatestVersionInstalled = $g.group[0].Version
-                        InstalledVersions = @($g.group[0].Version)
-                        PowerShellGet = $g.group[0].PowerShellGet
-                        LatestVersion = $g.group[0].LatestVersion
-                        UpdateAvailable = $g.group[0].UpdateAvailable
-                        Location = @($g.group[0].Location)
-                        Guid = @($g.group[0].Guid)
+                        InstalledVersions      = @($g.group[0].Version)
+                        PowerShellGet          = $g.group[0].PowerShellGet
+                        LatestVersion          = $g.group[0].LatestVersion
+                        UpdateAvailable        = $g.group[0].UpdateAvailable
+                        Location               = @($g.group[0].Location)
+                        Guid                   = @($g.group[0].Guid)
                     }
 
                 }
@@ -251,7 +254,7 @@ function Update-DesiredModule
 {
     [CmdletBinding()]
     param(
-        [parameter(ValueFromPipeline,ValueFromPipelineByPropertyName,ParameterSetName = 'Named')]
+        [parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'Named')]
         [string[]]$Name
     )
     #how to handle this - use AvailableModuleInstallationStatus as input?
