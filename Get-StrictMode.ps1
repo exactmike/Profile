@@ -135,7 +135,7 @@ so it searches all parent scopes until it finds a scope where it has been set).
                     }
                     else {
                         $ReturnProperties = @{}
-                        foreach ($PropName in echo Name, IsPublic, IsPrivate) {
+                        foreach ($PropName in @('Name','IsPublic','IsPrivate')) {
                             $ReturnProperties.$PropName = $CurrentField.$PropName
                         }
 

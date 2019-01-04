@@ -5,17 +5,33 @@ function Remove-Member
     param
     (
         [parameter(Mandatory, ValueFromPipeline)]
-        [psobject[]]$Object
+        [Alias('Object')]
+        [PSCustomObject[]]$InputObject
         ,
         [parameter(Mandatory)]
         [string]$Member
     )
-    begin {}
+    begin {
+        $ErrorActionPreference = 'Stop'
+    }
     process
     {
-        foreach ($o in $Object)
+        foreach ($o in $InputObject)
         {
-            $o.psobject.Members.Remove($Member)
+            switch ($o.GetType().name)
+            {
+                'PSCustomObject'
+                {
+                    Write-Verbose -Message "Using psobject.members.Remove($Member)"
+                    $o.psobject.Members.Remove($Member)
+                }
+                Default
+                {
+                   Write-Verbose -Message "Using Select-Object -property * -ExcludeProperty $Member"
+                   Write-Error -Message "Remove-Member is not effective for objects not of type PSCustomObject. This object is of type $($o.gettype().name)"
+                   #$o = $o | Select-Object -Property * -ExcludeProperty $Member
+                }
+            }
         }
     }
 }
