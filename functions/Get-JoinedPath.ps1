@@ -6,7 +6,7 @@ function Get-JoinedPath
     )
     foreach ($p in $Path)
     {
-        if ($p -contains ':' -and $p -notmatch '')
+        if ($p -contains ':' -and $p -notmatch ''){}
     }
     [IO.Path]::Combine($path)
 }
