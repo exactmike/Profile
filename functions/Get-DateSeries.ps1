@@ -1,8 +1,27 @@
+
+<#PSScriptInfo
+.DESCRIPTION
+ Gets a series of datetime objects for a specified start, interval, units (for the interval) and limit (for the number of datetime instances you want returned).
+.VERSION 1.0.0
+.GUID b8ca403c-daaa-451f-bbf4-92591a1e05aa
+.AUTHOR ThatExactMike
+.COMPANYNAME Exact Solutions
+.COPYRIGHT 2019
+.TAGS DateTime Series Intervals
+.LICENSEURI https://github.com/exactmike/profile/License
+.PROJECTURI https://gist.github.com/exactmike/517c5005319952c785a191c6143ca467
+.ICONURI
+.EXTERNALMODULEDEPENDENCIES
+.REQUIREDSCRIPTS
+.EXTERNALSCRIPTDEPENDENCIES
+.RELEASENOTES
+.PRIVATEDATA
+#>
 <#
 .SYNOPSIS
-    Given a start date, gets a series of dates for a specified interval and units and limit
+    Gets a series of datetime objects for a specified start, interval, units (for the interval) and limit (for the number of datetime instances you want returned).
 .DESCRIPTION
-    Given a start date, Gets a series of dates for a specified interval (like 7), and units (like days), and limit (the number of results you want in the series).
+    Gets a series of datetime objects for a specified start, interval, units (for the interval) and limit (for the number of datetime instances you want returned).
     For example, You can get every 14th day from this Friday for the next 10 sets of 14 days.
     Or, you can get every 4th minute for the next 400 minutes by specifying limit 100, units minutes, interval 4.
 .EXAMPLE
@@ -108,11 +127,6 @@ function Get-DateSeries
         [switch]
         $SkipStart
     )
-
-    begin
-    {
-    }
-
     process
     {
         $iteration = 0
@@ -165,9 +179,5 @@ function Get-DateSeries
             $nextDate
             $outputDate = $nextDate
         }
-    }
-
-    end
-    {
     }
 }
