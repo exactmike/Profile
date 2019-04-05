@@ -1,4 +1,25 @@
-<#
+
+<#PSScriptInfo
+.VERSION 1.0.0
+.GUID fc271373-c889-4814-90c7-4953b6bded26
+.DESCRIPTION Function to get a series of dates (datetime objects) for a specified interval and units and limit and start
+.AUTHOR thatexactmike
+.COMPANYNAME Exact Solutions
+.COPYRIGHT 2019
+.TAGS Date Time Series Interval
+.LICENSEURI https://github.com/exactmike/Profile/blob/master/license
+.PROJECTURI https://gist.github.com/exactmike/517c5005319952c785a191c6143ca467
+.ICONURI
+.EXTERNALMODULEDEPENDENCIES
+.REQUIREDSCRIPTS
+.EXTERNALSCRIPTDEPENDENCIES
+.RELEASENOTES
+.PRIVATEDATA
+#>
+
+function Get-DateSeries
+{
+    <#
 .SYNOPSIS
     Given a start date, gets a series of dates for a specified interval and units and limit
 .DESCRIPTION
@@ -60,8 +81,6 @@
 .OUTPUTS
     DateTime
 #>
-function Get-DateSeries
-{
     [CmdletBinding()]
     [Alias('gds')]
     [OutputType([DateTime[]])]
