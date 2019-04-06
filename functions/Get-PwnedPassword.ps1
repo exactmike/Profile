@@ -72,21 +72,22 @@ function Get-PwnedPassword {
         [ValidateNotNullOrEmpty()]
         [String]$Hash
     )
-    begin {
-    }
     process {
          switch ($PSCmdlet.ParameterSetName) {
-            'Password' {
+            'Password'
+            {
                 $pass = (New-Object PSCredential "user", $Password).GetNetworkCredential().Password
                 $Hash = $pass | Get-StringHash -AlgorithmName SHA1
                 $pass = $null
                 Remove-Variable -Name pass -Force
                 break
             }
-            'Hash' {
+            'Hash'
+            {
                 break
             }
-            default {
+            default
+            {
                 Write-Warning 'Unknown error occurred'
                 exit
             }
@@ -106,47 +107,18 @@ function Get-PwnedPassword {
                     Write-Error -Message "Slow down! Too many requests — the rate limit has been exceeded"
                 }
             }
-            break
         }
-        <#
-        if ($Response.StatusCode -eq '200') {
-            Write-Warning -Message "Oh No! - Password has been pwned - Change it NOW! `nYou should sign up for free at https://haveibeenpwned.com/ to be notified when your account is in a breach"
-        }
-        #>
-        $Response.content.split("`r").foreach({})
+        $Response.content.split("`n").foreach(
+            {
+                [PSCustomObject]@{
+                    Hash = [string]$HashPrefix + [string]$($_.split(':')[0])
+                    Count = $($_.split(':')[1]).trim()
+                }
+            }
+        ).where({$_.Hash -eq $Hash})
 
-    }
-    end {
+        <#
+
+        #>
     }
 }
-<#PSScriptInfo
-
-.VERSION 1.3
-
-.GUID bc54fa58-2ebc-4a87-8dd7-ecdcae505288
-
-.AUTHOR Rob Sewell @sqldbawithbeard https://sqldbawithabeard.com
-
-.DESCRIPTION Connects to the API at https://haveibeenpwned.com/ to see if a Password or Password hash has been found in a breach. Troy Hunt @troyhunt has created an API which allows you to query if a Password has been found in a breach. This is a simple function enabling you to query it
-
-.COMPANYNAME Sewells Consulting
-
-.COPYRIGHT
-
-.TAGS Pwned,Password,TroyHunt
-
-.LICENSEURI
-
-.PROJECTURI
-
-.ICONURI
-
-.EXTERNALMODULEDEPENDENCIES
-
-.REQUIREDSCRIPTS
-
-.EXTERNALSCRIPTDEPENDENCIES
-
-.RELEASENOTES
-
-#>
