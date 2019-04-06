@@ -17,7 +17,10 @@
 .RELEASENOTES
 .PRIVATEDATA
 #>
-<#
+
+function Get-DateSeries
+{
+    <#
 .SYNOPSIS
     Gets a series of datetime objects for a specified start, interval, units (for the interval) and limit (for the number of datetime instances you want returned).
 .DESCRIPTION
@@ -79,8 +82,6 @@
 .OUTPUTS
     DateTime
 #>
-function Get-DateSeries
-{
     [CmdletBinding()]
     [Alias('gds')]
     [OutputType([DateTime[]])]
