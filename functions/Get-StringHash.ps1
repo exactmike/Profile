@@ -45,9 +45,9 @@ Function Get-StringHash
     }
     Process
 	{
-        $md5StringBuilder = New-Object System.Text.StringBuilder
-        $ue = New-Object System.Text.UTF8Encoding
-        $hashAlgorithm.ComputeHash($ue.GetBytes($String)) | ForEach-Object { [void] $md5StringBuilder.Append($_.ToString("x2")) }
+        $md5StringBuilder = [System.Text.StringBuilder]::new()
+        $ue = [System.Text.UTF8Encoding]::new()
+        $hashAlgorithm.ComputeHash($ue.GetBytes($String)).foreach({[void] $md5StringBuilder.Append($_.ToString("x2"))})
         $md5StringBuilder.ToString()
     }
 }
