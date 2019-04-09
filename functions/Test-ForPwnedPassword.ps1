@@ -1,3 +1,22 @@
+
+<#PSScriptInfo
+.VERSION 0.1.0
+.GUID ebf6eee6-612c-4dd4-a577-a3e66c48a447
+.AUTHOR ThatExactMike
+.COMPANYNAME Exact Solutions
+.COPYRIGHT 2019
+.TAGS Security Passwords
+.LICENSEURI https://raw.githubusercontent.com/exactmike/Profile/master/license
+.PROJECTURI https://github.com/exactmike/Profile/blob/master/functions/Test-ForPwnedPassword.ps1
+.ICONURI
+.EXTERNALMODULEDEPENDENCIES
+.REQUIREDSCRIPTS
+.EXTERNALSCRIPTDEPENDENCIES
+.RELEASENOTES
+.PRIVATEDATA
+.DESCRIPTION
+ Connects to the API at https://api.pwnedpasswords.com/ and sends the first 5 characters of the password's SHA1 hash to see if the password has been found in a breach.
+#>
 <#
 .SYNOPSIS
 Connects to the API at https://api.pwnedpasswords.com/ and sends the first 5 characters of the password's SHA1 hash to see if the password has been found in a breach.
@@ -38,6 +57,7 @@ Prompts for a password and tests the password hash to see if it is present in th
 .NOTES
     AUTHOR : Mike Campbell
     DATE : 2019-04-05
+    Version: 0.1.0
 
     Adapted from the work of https://sqldbawithabeard.com/2017/08/09/using-powershell-to-check-if-your-password-has-been-in-a-breach/
     Indebted to @TroyHunt on Twitter for the services hosted at https://haveibeenpwned.com/
