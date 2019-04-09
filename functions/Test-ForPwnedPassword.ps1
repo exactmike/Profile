@@ -89,9 +89,10 @@ function Test-ForPwnedPassword
         {
             'Password'
             {
-                $Private:pass = (New-Object PSCredential "user", $Password).GetNetworkCredential().Password
+                $TempCred = [system.management.automation.pscredential]::new('User',$Password)
+                $Private:pass = $TempCred.GetNetworkCredential().Password
                 $Hash = Get-StringHash -AlgorithmName SHA1 -String $Private:pass
-                $pass = $null
+                $Private:pass = $null
                 Remove-Variable -Name pass -Force -Scope Private
             }
             Default
