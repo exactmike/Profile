@@ -12,6 +12,7 @@ If you wish to avoid this, use the Hash parameter / parameter set providing your
 .PARAMETER Password
 A secure string version of the password you wish to test. There are many ways to obtain a SecureString, for example, Get-Credential, ConvertTo-SecureString, or Read-Host (as shown in one of the examples).
 If no value is provided for this parameter and the hash parameter is not used PowerShell will prompt for a value.
+NOTE: If you are running this function in a remote session on a non-windows machine you must provide a value for the Password parameter rather than letting the function prompt you for a value.  This is because SecureString cannot be passed between local and remote on non-windows systems at this time.
 
 .PARAMETER Hash
 A SHA1 hash of the password you wish to test.
