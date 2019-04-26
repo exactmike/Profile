@@ -17,7 +17,7 @@
             'Any'
             {([char]33..[char]95) + ([char[]]([char]97..[char]126))}
             'NoSpecial'
-            {([char]65..[char]90) + ([char[]]([char]97..[char]122))}
+            {([char]48..[char]57) + ([char]65..[char]90) + ([char[]]([char]97..[char]122))}
         }
     )
     (1..$Length | ForEach-Object {$ArrayOfChars | Get-Random}) -join ''
