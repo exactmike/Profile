@@ -5,17 +5,20 @@
         [parameter(ValueFromPipeline, ValueFromPipelineByPropertyName, ParameterSetName = 'Named', Position = 1)]
         [string[]]$Name
         ,
-        [parameter(ParameterSetName = 'Named', Position = 2)]
-        [string]$RequiredVersion
-        ,
         [string]$Repository
+        ,
+        [switch]$PerInstalledVersion
     )
     begin
     {
         [System.Collections.ArrayList]$LocalModules = @()
         [System.Collections.ArrayList]$LocalPowerShellGetModules = @()
         [System.Collections.ArrayList]$LatestRepositoryModules = @()
-        $FindModuleParams = @{}
+        [System.Collections.ArrayList]$NamedModules = @()
+        [System.Collections.ArrayList]$RepoFoundModules = @()
+        $FindModuleParams = @{
+            ErrorAction = 'SilentlyContinue'
+        }
         if ($PSBoundParameters.ContainsKey('Repository'))
         {
             $FindModuleParams.Repository = $PSBoundParameters.Repository
@@ -33,11 +36,16 @@
                 #Get the locally available modules on this system for the current user based on entries in $env:Psmodulepath
                 @(Get-Module -ListAvailable).foreach({$LocalModules.add($_) | Out-Null})
                 #Get the locally available modules that were installed using PowerShellGet Module commands
-                $LocalModules.where({$null -ne $_.RepositorySourceLocation}).foreach({Get-InstalledModule -Name $_.Name -AllVersions}).foreach({$LocalPowerShellGetModules.add($_) | Out-Null})
+                $LocalModules.where({$null -ne $_.RepositorySourceLocation}).foreach({Get-InstalledModule -Name $_.Name -RequiredVersion $_.Version @GetInstalledModuleParams}).foreach({$LocalPowerShellGetModules.add($_) | Out-Null})
+                ($LocalModules.ForEach({$_.Name}) | Sort-Object -Unique).foreach({$NamedModules.add([pscustomobject]@{Name=$_}) | Out-Null})
                 $LocalPowerShellGetModules.ForEach({
-                    $FindModuleParams.Name = $_.name
-                    $RepositoryModule = Find-Module @FindModuleParams
-                    $LatestRepositoryModules.add($RepositoryModule) | Out-Null
+                    if (-not $RepoFoundModules.Contains($_.name))
+                    {
+                        $FindModuleParams.Name = $_.name
+                        $RepositoryModule = Find-Module @FindModuleParams
+                        $LatestRepositoryModules.add($RepositoryModule) | Out-Null
+                        $RepoFoundModules.add($_.name) | Out-Null
+                    }
                 })
             }
             'Named'
@@ -48,120 +56,148 @@
                     $LocalModules.add($(Get-Module -ListAvailable -Name $n -ErrorAction Stop)) | Out-Null
                     #Get the locally available named module(s) that were installed using PowerShellGet Module commands
                     $GetInstalledModuleParams.Name = $n
-                    switch ($PSBoundParameters.ContainsKey('RequiredVersion'))
-                    {
-                        $true
-                        {
-                            $GetInstalledModuleParams.RequiredVersion = $PSBoundParameters.RequiredVersion
-                        }
-                        $false
-                        {
-                            $GetInstalledModuleParams.AllVersions = $true
-                        }
-                    }
+                    $GetInstalledModuleParams.AllVersions = $true
                     $LocalPowerShellGetModules.add($(Get-InstalledModule @GetInstalledModuleParams)) | Out-Null
                     #Get the PSGallery Module for the named module
                     $FindModuleParams.Name = $n
-                    $RepositoryModule = Find-Module @FindModuleParams
-                    $LatestRepositoryModules.add($($RepositoryModule)) | Out-Null
+                    $LatestRepositoryModule = Find-Module @FindModuleParams
+                    $LatestRepositoryModules.add($LatestRepositoryModule) | Out-Null
+                    $NamedModules.add($([pscustomobject]@{Name=$n})) | Out-Null
                 }
             }
         }
     }
     End
     {
-        $ToReturn = @{
-            LatestRepositoryModules = $LatestRepositoryModules
-            LocalModules = $LocalModules
-            LocalPowerShellGetModules = $LocalPowerShellGetModules
-        }
-        $ToReturn
-    }
-<#     End
-    {
-        $LocalModulesLookup = $LocalModules | Group-Object -AsHashTable -Property Name
-        $LocalPowerShellGetModulesLookup = $LocalPowerShellGetModules | Select-Object -Property Name,Version | Group-Object -AsHashTable -Property Name
-        $LatestRepositoryModulesLookup = $LatestRepositoryModules | Select-Object -Property Name,Version | Select-Object -Unique | Group-Object -AsHashTable -Property Name
-        $ModuleVersionStatuses = @(
-            foreach ($am in $LocalModules)
+        $LocalModulesLookupNV = $LocalModules.foreach({$_}) | Select-Object -Property Name,Version,Path,GUID,ModuleBase,LicenseUri,ProjectUri,@{n='NameVersion';e={$_.Name + $_.Version}} | Group-Object -AsHashTable -Property NameVersion
+        #$LocalModulesLookupN = $LocalModules.foreach({$_}) | Select-Object -Property Name,Version,Path,GUID,ModuleBase,LicenseUri,ProjectUri,@{n='NameVersion';e={$_.Name + $_.Version}} | Group-Object -AsHashTable -Property Name
+        $LocalPowerShellGetModulesLookup = $LocalPowerShellGetModules.foreach({$_}) | Select-Object -Property Name,Version,Author,PublishedDate,InstalledDate,UpdatedDate,LicenseUri,InstalledLocation,Repository,@{n='NameVersion';e={$_.Name + $_.Version}} | Group-Object -AsHashTable -Property NameVersion
+        $LatestRepositoryModulesLookup = $LatestRepositoryModules.foreach({$_}) | Select-Object -Property Name,Version,Author,PublishedDate,LicenseUri,ProjectUri,Repository | Group-Object -AsHashTable -Property Name
+        switch ($PSCmdlet.ParameterSetName)
+        {
+            'All'
             {
-                #Iterate through available modules
-                $ModuleVersionStatus = [PSCustomObject]@{
-                    Name            = $am.Name
-                    Version         = $am.Version
-                    PowerShellGet   = $null
-                    LatestVersion   = $null
-                    UpdateAvailable = $null
-                    Location        = Split-Path -Path $am.ModuleBase -Parent
-                    Guid            = $am.Guid.guid
-                }
-                switch ($LocalPowerShellGetModulesLookup.ContainsKey($am.Name))
-                {
-                    $true
+                $PerInstalledVersionOutput = @(
+                    foreach ($lm in $LocalModules.foreach({$_}))
                     {
-                        try
+                        $lookup = $lm.Name + $lm.Version
+                        [PSCustomObject]@{
+                            Name = $lm.Name
+                            Version = $lm.Version
+                            IsLatestVersion = if ($null -ne $LatestRepositoryModulesLookup.$($lm.name).Version) {$lm.version -eq $LatestRepositoryModulesLookup.$($lm.name).Version} else {$null}
+                            OtherInstalledVersions = @($LocalModules.foreach({$_}).where({$_.Name -ieq $lm.Name -and $_.Version -ne $lm.Version}).foreach({$_.Version.tostring()}))
+                            InstalledFromRepository = $null -ne $lm.RepositorySourceLocation
+                            Repository = $LocalPowerShellGetModulesLookup.$lookup.Repository
+                            InstalledLocation = $lm.ModuleBase
+                            InstalledDate = $LocalPowerShellGetModulesLookup.$lookup.InstalledDate
+                            PublishedDate = $LocalPowerShellGetModulesLookup.$lookup.PublishedDate
+                            LatestRepositoryVersion = $LatestRepositoryModulesLookup.$($lm.name).Version
+                            LatestRepositoryVersionPublishedDate = $LatestRepositoryModulesLookup.$($lm.name).PublishedDate
+                            LatestVersionInstalled = if ($null -eq $lm.RepositorySourceLocation) {$null} else {$LocalModulesLookupNV.ContainsKey($lm.Name + $LatestRepositoryModulesLookup.$($lm.name).Version.tostring())}
+                        }
+                    }
+                )
+            }
+            'Named'
+            {
+                $PerInstalledVersionOutput = @(
+                    foreach ($nm in $NamedModules)
+                    {
+                        if ($LocalModules.foreach({$_}).where({$_.Name -ieq $nm.Name}).count -ge 1)
                         {
-
-                            $PSGetModule = $null
-                            $PSGetModule = Get-InstalledModule -Name $am.name -RequiredVersion $am.Version -ErrorAction Stop
-                            if ($null -ne $PSGetModule)
+                            foreach ($lm in $LocalModules.foreach({$_}).where({$_.Name -ieq $nm.Name}))
                             {
-                                $ModuleVersionStatus.PowerShellGet = $true
-                                $ModuleVersionStatus.LatestVersion = $LatestRepositoryModulesLookup.$($am.name).Version
-                                $ModuleVersionStatus.UpdateAvailable = $($ModuleVersionStatus.LatestVersion -gt $ModuleVersionStatus.Version)
+                                $lookup = $nm.Name + $lm.Version
+                                [PSCustomObject]@{
+                                    Name = $nm.Name
+                                    Version = $lm.Version
+                                    IsLatestVersion = if ($null -ne $LatestRepositoryModulesLookup.$($nm.name).Version) {$lm.version -eq $LatestRepositoryModulesLookup.$($nm.name).Version} else {$null}
+                                    OtherInstalledVersions = @($LocalModules.foreach({$_}).where({$_.Name -ieq $nm.Name -and $_.Version -ne $lm.Version}).foreach({$_.Version}))
+                                    InstalledFromRepository = $null -ne $lm.RepositorySourceLocation
+                                    Repository = $LocalPowerShellGetModulesLookup.$lookup.Repository
+                                    InstalledLocation = $lm.ModuleBase
+                                    InstalledDate = $LocalPowerShellGetModulesLookup.$lookup.InstalledDate
+                                    PublishedDate = $LocalPowerShellGetModulesLookup.$lookup.PublishedDate
+                                    LatestRepositoryVersion = $LatestRepositoryModulesLookup.$($nm.name).Version
+                                    LatestRepositoryVersionPublishedDate = $LatestRepositoryModulesLookup.$($nm.name).PublishedDate
+                                    LatestVersionInstalled = if ($null -eq $lm.RepositorySourceLocation) {$null} else {$LocalModulesLookupNV.ContainsKey($lm.Name + $LatestRepositoryModulesLookup.$($lm.name).Version.tostring())}
+                                    #LatestVersionInstalled = $LocalModulesLookupNV.ContainsKey($nm.Name + $LatestRepositoryModulesLookup.$($nm.name).Version.tostring())
+                                }
                             }
                         }
-                        catch
+                        else
                         {
-                            $ModuleVersionStatus.PowerShellGet = $false
-                            $ModuleVersionStatus.LatestVersion = 'Unknown'
-                            $ModuleVersionStatus.UpdateAvailable = 'Unknown'
+                            $lookup = $nm.Name
+                            [PSCustomObject]@{
+                                Name = $lookup
+                                Version = $null
+                                IsLatestVersion = $null
+                                OtherInstalledVersions = $null
+                                InstalledFromRepository = $null
+                                Repository = $LatestRepositoryModulesLookup.$lookup.Repository
+                                InstalledLocation = $null
+                                InstalledDate = $null
+                                PublishedDate = $null
+                                LatestRepositoryVersion = $LatestRepositoryModulesLookup.$lookup.Version
+                                LatestRepositoryVersionPublishedDate = $LatestRepositoryModulesLookup.$lookup.PublishedDate
+                                LatestVersionInstalled = $false
+                            }
                         }
                     }
-                    $false
-                    {
-                        $ModuleVersionStatus.PowerShellGet = $false
-                        $ModuleVersionStatus.LatestVersion = 'Unknown'
-                        $ModuleVersionStatus.UpdateAvailable = 'Unknown'
-                    }
-                }
-                $ModuleVersionStatus
+                )
             }
-        )
-        $GroupVersionStatusByModuleName = @($ModuleVersionStatuses | Group-Object -Property Name)
-        foreach ($g in $GroupVersionStatusByModuleName)
+        }
+        switch ($PerInstalledVersion)
         {
-            switch ($g.count -gt 1)
+            $true
             {
-                $true
+                $PerInstalledVersionOutput
+            }
+            $false
+            {
+                $PerModuleGroups = $PerInstalledVersionOutput | Group-Object -Property Name
+                foreach ($pmg in $PerModuleGroups)
                 {
-                    [PSCustomObject]@{
-                        Name                   = $g.Name
-                        LatestVersionInstalled = $g.group.Version | Sort-Object -Descending | Select-Object -First 1
-                        InstalledVersions      = @($g.group.Version | Sort-Object -Descending -Unique)
-                        PowerShellGet          = if ($g.group.PowerShellGet -contains $true) {$true} else {$false}
-                        LatestVersion          = $g.group.LatestVersion | Where-Object -FilterScript {$_ -ne 'Unknown'} | Sort-Object -Descending | Select-Object -First 1
-                        UpdateAvailable        = if ($g.group.UpdateAvailable -contains $false) {$false} else {$true}
-                        Location               = @($g.group.Location | Select-Object -Unique)
-                        Guid                   = @($g.group.Guid | Select-Object -Unique)
-                    }
-
-
-                }
-                $false
-                {
-                    [PSCustomObject]@{
-                        Name                   = $g.Name
-                        LatestVersionInstalled = $g.group[0].Version
-                        InstalledVersions      = @($g.group[0].Version)
-                        PowerShellGet          = $g.group[0].PowerShellGet
-                        LatestVersion          = $g.group[0].LatestVersion
-                        UpdateAvailable        = $g.group[0].UpdateAvailable
-                        Location               = @($g.group[0].Location)
-                        Guid                   = @($g.group[0].Guid)
+                    $lvInstalled = $pmg.Group.Version.foreach({$_.tostring()}) | Sort-Object -Descending | Select-Object -first 1
+                    switch ($null -eq $lvInstalled)
+                    {
+                        $false
+                        {
+                            [PSCustomObject]@{
+                                Name = $pmg.Name
+                                Version = $lvInstalled
+                                IsLatestVersion = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).IsLatestVersion | Select-Object -Unique
+                                OtherInstalledVersions = @($pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).OtherInstalledVersions | Select-Object -Unique)
+                                InstalledFromRepository = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).InstalledFromRepository | Select-Object -Unique
+                                Repository = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).Repository | Select-Object -Unique
+                                InstalledLocation = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).InstalledLocation
+                                InstalledDate = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).InstalledDate | Select-Object -Unique
+                                PublishedDate = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).PublishedDate | Select-Object -Unique
+                                LatestRepositoryVersion = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).LatestRepositoryVersion | Select-Object -Unique
+                                LatestRepositoryVersionPublishedDate = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).LatestRepositoryVersionPublishedDate | Select-Object -Unique
+                                LatestVersionInstalled = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).LatestVersionInstalled | Select-Object -Unique
+                            }
+                        }
+                        $true
+                        {
+                            [PSCustomObject]@{
+                                Name = $pmg.Name
+                                Version = $null
+                                IsLatestVersion = $null
+                                OtherInstalledVersions = $null
+                                InstalledFromRepository = $null
+                                Repository = $LatestRepositoryModulesLookup.$($pmg.Name).Repository
+                                InstalledLocation = $null
+                                InstalledDate = $null
+                                PublishedDate = $null
+                                LatestRepositoryVersion = $LatestRepositoryModulesLookup.$($pmg.Name).Version
+                                LatestRepositoryVersionPublishedDate = $LatestRepositoryModulesLookup.$($pmg.Name).PublishedDate
+                                LatestVersionInstalled = $False
+                            }
+                        }
                     }
                 }
             }
         }
-    } #>
+    }
 }
