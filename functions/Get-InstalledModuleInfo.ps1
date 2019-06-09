@@ -69,10 +69,13 @@
     }
     End
     {
-        $LocalModulesLookupNV = $LocalModules.foreach({$_}) | Select-Object -Property Name,Version,Path,GUID,ModuleBase,LicenseUri,ProjectUri,@{n='NameVersion';e={$_.Name + $_.Version}} | Group-Object -AsHashTable -Property NameVersion
+        $LocalModulesLookupNV = @{}
+        $LocalModules.foreach({$_}) | Select-Object -Property Name,Version,Path,GUID,ModuleBase,LicenseUri,ProjectUri,@{n='NameVersion';e={[string]$($_.Name + $_.Version)}} | ForEach-Object -Process {$LocalModulesLookupNV.$($_.NameVersion) = $_}
         #$LocalModulesLookupN = $LocalModules.foreach({$_}) | Select-Object -Property Name,Version,Path,GUID,ModuleBase,LicenseUri,ProjectUri,@{n='NameVersion';e={$_.Name + $_.Version}} | Group-Object -AsHashTable -Property Name
-        $LocalPowerShellGetModulesLookup = $LocalPowerShellGetModules.foreach({$_}) | Select-Object -Property Name,Version,Author,PublishedDate,InstalledDate,UpdatedDate,LicenseUri,InstalledLocation,Repository,@{n='NameVersion';e={$_.Name + $_.Version}} | Group-Object -AsHashTable -Property NameVersion
-        $LatestRepositoryModulesLookup = $LatestRepositoryModules.foreach({$_}) | Select-Object -Property Name,Version,Author,PublishedDate,LicenseUri,ProjectUri,Repository | Group-Object -AsHashTable -Property Name
+        $LocalPowerShellGetModulesLookup = @{}
+        $LocalPowerShellGetModules.foreach({$_}) | Select-Object -Property Name,Version,Author,PublishedDate,InstalledDate,UpdatedDate,LicenseUri,InstalledLocation,Repository,@{n='NameVersion';e={$_.Name + $_.Version}} | ForEach-Object -Process {$LocalPowerShellGetModulesLookup.$($_.NameVersion) = $_}
+        $LatestRepositoryModulesLookup = @{}
+        $LatestRepositoryModules.foreach({$_}) | Select-Object -Property Name,Version,Author,PublishedDate,LicenseUri,ProjectUri,Repository | ForEach-Object -Process {$LatestRepositoryModulesLookup.$($_.Name) = $_}
         switch ($PSCmdlet.ParameterSetName)
         {
             'All'
@@ -85,7 +88,7 @@
                             Name = $lm.Name
                             Version = $lm.Version
                             IsLatestVersion = if ($null -ne $LatestRepositoryModulesLookup.$($lm.name).Version) {$lm.version -eq $LatestRepositoryModulesLookup.$($lm.name).Version} else {$null}
-                            OtherInstalledVersions = @($LocalModules.foreach({$_}).where({$_.Name -ieq $lm.Name -and $_.Version -ne $lm.Version}).foreach({$_.Version.tostring()}))
+                            AllInstalledVersions = @($LocalModules.foreach({$_}).where({$_.Name -ieq $lm.Name}).foreach({$_.Version.tostring()}))
                             InstalledFromRepository = $null -ne $lm.RepositorySourceLocation
                             Repository = $LocalPowerShellGetModulesLookup.$lookup.Repository
                             InstalledLocation = $lm.ModuleBase
@@ -112,7 +115,7 @@
                                     Name = $nm.Name
                                     Version = $lm.Version
                                     IsLatestVersion = if ($null -ne $LatestRepositoryModulesLookup.$($nm.name).Version) {$lm.version -eq $LatestRepositoryModulesLookup.$($nm.name).Version} else {$null}
-                                    OtherInstalledVersions = @($LocalModules.foreach({$_}).where({$_.Name -ieq $nm.Name -and $_.Version -ne $lm.Version}).foreach({$_.Version}))
+                                    AllInstalledVersions = @($LocalModules.foreach({$_}).where({$_.Name -ieq $nm.Name}).foreach({$_.Version}))
                                     InstalledFromRepository = $null -ne $lm.RepositorySourceLocation
                                     Repository = $LocalPowerShellGetModulesLookup.$lookup.Repository
                                     InstalledLocation = $lm.ModuleBase
@@ -132,7 +135,7 @@
                                 Name = $lookup
                                 Version = $null
                                 IsLatestVersion = $null
-                                OtherInstalledVersions = $null
+                                AllInstalledVersions = $null
                                 InstalledFromRepository = $null
                                 Repository = $LatestRepositoryModulesLookup.$lookup.Repository
                                 InstalledLocation = $null
@@ -167,7 +170,7 @@
                                 Name = $pmg.Name
                                 Version = $lvInstalled
                                 IsLatestVersion = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).IsLatestVersion | Select-Object -Unique
-                                OtherInstalledVersions = @($pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).OtherInstalledVersions | Select-Object -Unique)
+                                AllInstalledVersions = @($pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).AllInstalledVersions | Select-Object -Unique)
                                 InstalledFromRepository = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).InstalledFromRepository | Select-Object -Unique
                                 Repository = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).Repository | Select-Object -Unique
                                 InstalledLocation = $pmg.Group.where({$_.version.tostring() -eq $lvInstalled}).InstalledLocation
@@ -184,7 +187,7 @@
                                 Name = $pmg.Name
                                 Version = $null
                                 IsLatestVersion = $null
-                                OtherInstalledVersions = $null
+                                AllInstalledVersions = $null
                                 InstalledFromRepository = $null
                                 Repository = $LatestRepositoryModulesLookup.$($pmg.Name).Repository
                                 InstalledLocation = $null
