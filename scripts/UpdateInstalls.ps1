@@ -17,6 +17,6 @@ Function Import-ManagedPackageDefinition
             }
         ) -notcontains $false)
     {
-        $Script:ManagedPackages
+        $Script:ManagedPackages = $ManagedPackages
     }
 }
