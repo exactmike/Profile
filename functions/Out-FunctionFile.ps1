@@ -1,19 +1,29 @@
 function Out-FunctionFile
 {
     [CmdletBinding()]
-    param(
-        $Function,
-        $Path
+    param
+    (
+        [parameter(Mandatory, ValueFromPipeline)]
+        [System.Management.Automation.FunctionInfo]$FunctionInfo
+        ,
+        [Parameter(Mandatory)]
+        [string]$Path
     )
-
-    $FileName = $Function.Name + '.ps1'
-    $Contents = @"
-    Function $($Function.Name)
+    process
     {
-        $($Function.Scriptblock)
-    }
+        foreach ($Function in $FunctionInfo)
+        {
+            $FileName = $Function.Name + '.ps1'
+            $Contents =
+            @"
+Function $($Function.Name)
+{
+    $($Function.Scriptblock)
+}
 
 "@
-    $outpath = Join-Path -Path $Path -ChildPath $FileName
-    $Contents | Out-File -FilePath $outpath -Encoding utf8
+            $outpath = Join-Path -Path $Path -ChildPath $FileName
+            $Contents | Out-File -FilePath $outpath -Encoding utf8
+        }
+    }
 }
