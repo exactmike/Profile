@@ -22,8 +22,7 @@ function Update-ManagedInstall
         $AdditionalParameters
         ,
         [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
-        [ValidateSet('PowerShellGet', 'Chocolatey', 'Git')]
-        [string]$InstallManager
+        [InstallManager]$InstallManager
         #,
         #[Parameter()]
         #[string]$Repository
@@ -38,7 +37,7 @@ function Update-ManagedInstall
     {
         if ($localmachinename -notin $ExemptMachines)
         {
-            switch ($PackageManager)
+            switch ($InstallManager)
             {
                 'PowerShellGet'
                 {
