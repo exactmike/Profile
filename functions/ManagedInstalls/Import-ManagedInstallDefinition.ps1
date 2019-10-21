@@ -1,6 +1,6 @@
 Function Import-ManagedInstallDefinition
 {
-    
+
     [cmdletbinding()]
     param(
         $Path
@@ -13,10 +13,27 @@ Function Import-ManagedInstallDefinition
             {
                 Test-Member -inputobject $ManagedInstalls[0] -Name $rp
             }
-        ) -notcontains $false)
+        ) -notcontains $false
+    )
     {
+        foreach ($mi in $ManagedInstalls)
+        {
+            switch ($mi)
+            {
+                { $mi.AutoUpgrade -eq 'TRUE' }
+                { $mi.AutoUpgrade = $true }
+                { $mi.AutoUpgrade -eq 'FALSE' }
+                { $mi.AutoUpgrade = $false }
+                { [string]::IsNullOrWhiteSpace($mi.AutoUpgrade) }
+                { $mi.AutoUpgrade = $false }
+                { $mi.AutoRemove -eq 'TRUE' }
+                { $mi.AutoRemove = $true }
+                { $mi.AutoRemove -eq 'FALSE' }
+                { $mi.AutoRemove = $false }
+                { [string]::IsNullOrWhiteSpace($mi.AutoRemove) }
+                { $mi.AutoRemove = $false }
+            }
+        }
         $Script:ManagedInstalls = $ManagedInstalls
     }
-
 }
-
