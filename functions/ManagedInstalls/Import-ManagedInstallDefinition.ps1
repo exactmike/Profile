@@ -18,21 +18,7 @@ Function Import-ManagedInstallDefinition
     {
         foreach ($mi in $ManagedInstalls)
         {
-            switch ($mi)
-            {
-                { $mi.AutoUpgrade -eq 'TRUE' }
-                { $mi.AutoUpgrade = $true }
-                { $mi.AutoUpgrade -eq 'FALSE' }
-                { $mi.AutoUpgrade = $false }
-                { [string]::IsNullOrWhiteSpace($mi.AutoUpgrade) }
-                { $mi.AutoUpgrade = $false }
-                { $mi.AutoRemove -eq 'TRUE' }
-                { $mi.AutoRemove = $true }
-                { $mi.AutoRemove -eq 'FALSE' }
-                { $mi.AutoRemove = $false }
-                { [string]::IsNullOrWhiteSpace($mi.AutoRemove) }
-                { $mi.AutoRemove = $false }
-            }
+            Convert-StringBoolToBool -object $mi
         }
         $Script:ManagedInstalls = $ManagedInstalls
     }
