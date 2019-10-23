@@ -1,9 +1,12 @@
 function Convert-StringBoolToBool
 {
-    [CmdletBinding(DefaultParameterSetName = 'Object')]
+    [CmdletBinding(DefaultParameterSetName = 'AllPropertiesOfObject')]
     param(
-        [parameter(ValueFromPipeline, ParameterSetName = 'Object')]
+        [parameter(ValueFromPipeline, ParameterSetName = 'AllPropertiesOfObject')]
         [object]$Object
+        ,
+        [parameter(ParameterSetName = 'AllPropertiesOfObject')]
+        [string[]]$IncludeProperty #use to include properties that might have an empty string. Sets them to $False.  Otherwise, this only converts string members with a TRUE or FALSE string value.
     )
     process
     {
@@ -16,8 +19,14 @@ function Convert-StringBoolToBool
                 {
                     'TRUE'
                     { $o.$sm = $true }
+
                     'FALSE'
                     { $o.$sm = $false }
+
+                    {[string]::IsNullOrEmpty($_) -and $sm -in $IncludeProperty}
+                    {
+                        $o.$sm = $false
+                    }
                 }
             }
         }
