@@ -18,7 +18,7 @@ Function Import-ManagedInstallDefinition
     {
         foreach ($mi in $ManagedInstalls)
         {
-            Convert-StringBoolToBool -object $mi
+            Convert-StringBoolToBool -object $mi -IncludeProperty 'AutoUpgrade','AutoRemove'
         }
         $Script:ManagedInstalls = $ManagedInstalls
     }
