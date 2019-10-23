@@ -37,6 +37,7 @@ function Update-ManagedInstall
     {
         if ($localmachinename -notin $ExemptMachines)
         {
+            Write-Information -MessageData "Using $InstallManager to Process Install Definition: $Name"
             switch ($InstallManager)
             {
                 'PowerShellGet'
@@ -147,6 +148,10 @@ function Update-ManagedInstall
                     }
                 }
             }
+        }
+        else
+        {
+            Write-Information -MessageData "$localmachinenanme is in ExemptMachines entry. Skipping Install Definition: $Name"
         }
     }
     end
