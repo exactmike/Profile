@@ -4,7 +4,7 @@
 function GetOrgProfileMenuMessage
     {
         param($OrgProfile)
-        $Message = 
+        $Message =
 @"
     Oneshell: Org Profile Menu
 
@@ -121,7 +121,7 @@ function Start-AdminUserProfileBuilder
                 {
                     $InitialDirectory = Split-Path -Path $AdminUserProfile.General.ProfileFolder
                     $ProfileDirectory = GetAdminUserProfileFolder -InitialDirectory $InitialDirectory
-                } else 
+                } else
                 {
                     $ProfileDirectory = GetAdminUserProfileFolder
                 }
@@ -227,7 +227,7 @@ function Start-AdminUserProfileEditor
     (
         [Parameter(ParameterSetName = 'Object',ValueFromPipeline,Mandatory)]
         [ValidateScript({$_.ProfileType -eq 'OneShellAdminUserProfile'})]
-        [psobject]$ProfileObject 
+        [psobject]$ProfileObject
         ,
         [parameter(ParameterSetName = 'Identity')]
         [parameter(ParameterSetName = 'Name')]
@@ -238,19 +238,19 @@ function Start-AdminUserProfileEditor
         [parameter(ParameterSetName = 'Name')]
         [switch]$Passthru
     )
-    DynamicParam
+<#     DynamicParam
     {
         if ($null -eq $Path)
         {
             $path = "$env:UserProfile\OneShell\"
         }
-        $dictionary = New-DynamicParameter -Name 'Identity' -Type $([String[]]) -ValidateSet @(GetPotentialAdminUserProfiles -path $Path | Select-Object -ExpandProperty Identity) -ParameterSetName Identity -Mandatory $true
-        $dictionary = New-DynamicParameter -Name 'Name' -Type $([String[]]) -ValidateSet @(GetPotentialAdminUserProfiles -path $Path | Select-Object -ExpandProperty Name -ErrorAction SilentlyContinue) -Mandatory $true -ParameterSetName Name -DPDictionary $dictionary 
+        #$dictionary = New-DynamicParameter -Name 'Identity' -Type $([String[]]) -ValidateSet @(GetPotentialAdminUserProfiles -path $Path | Select-Object -ExpandProperty Identity) -ParameterSetName Identity -Mandatory $true
+        #$dictionary = New-DynamicParameter -Name 'Name' -Type $([String[]]) -ValidateSet @(GetPotentialAdminUserProfiles -path $Path | Select-Object -ExpandProperty Name -ErrorAction SilentlyContinue) -Mandatory $true -ParameterSetName Name -DPDictionary $dictionary
         Write-Output -InputObject $dictionary
-    }
+    } #>
     Process
     {
-        Set-DynamicParameterVariable -dictionary $dictionary
+        #Set-DynamicParameterVariable -dictionary $dictionary
         switch ($PSCmdlet.ParameterSetName)
         {
             'Object'
@@ -343,7 +343,7 @@ function Start-AdminUserProfileEditor
                     {
                         $InitialDirectory = Split-Path -Path $AdminUserProfile.General.ProfileFolder
                         $ProfileDirectory = GetAdminUserProfileFolder -InitialDirectory $InitialDirectory
-                    } else 
+                    } else
                     {
                         $ProfileDirectory = GetAdminUserProfileFolder
                     }
@@ -377,7 +377,7 @@ function Start-AdminUserProfileEditor
                 'Systems'
                 {
                     $AdminUserProfile.Systems = GetAdminUserProfileSystemEntries -OrganizationIdentity $OrganizationIdentity -AdminUserProfile $AdminUserProfile
-                } 
+                }
                 'Save'
                 {
                     if ($AdminUserProfile.General.ProfileFolder -eq '')
@@ -465,7 +465,7 @@ function Start-AdminUserProfileCredentialEditor
     do
     {
         $prompt = GetAdminUserProfileCredentialPrompt -labels $labels -editableCredentials $editableCredentials
-        $response = 
+        $response =
             switch ($UseGUI -or $host.Name -notlike 'Console*')
             {
                 $true
@@ -488,7 +488,7 @@ function Start-AdminUserProfileCredentialEditor
                 if ($editableCredentials.Count -lt 1) {Write-Error -Message 'There are no credentials to edit'}
                 else {
                     $CredChoices = @($editableCredentials.UserName)
-                    $whichcred = 
+                    $whichcred =
                         switch ($UseGUI -or $host.Name -notlike 'Console*')
                         {
                             $true
@@ -518,7 +518,7 @@ function Start-AdminUserProfileCredentialEditor
                     }
                     $editableCredentials = @($editableCredentials | Where-Object -FilterScript {$editableCredentials[$whichcred] -ne $_})
                 }
-                
+
             }
             3 {$noMoreCreds = $true} #Done
         }
@@ -584,7 +584,7 @@ function GetAdminUserProfileEmailAddress
   if ($PSBoundParameters.ContainsKey('CurrentEmailAddress'))
   {
     $ReadInputBoxDialogParams.DefaultText = $CurrentEmailAddress
-  } 
+  }
   do
   {
     $address = Read-InputBoxDialog @ReadInputBoxDialogParams
@@ -649,7 +649,7 @@ function GetAdminUserProfileSystemEntries
     {
         $system = $systems | Where-Object -FilterScript {$_.Identity -eq $s.Identity}
         "$($system.SystemType):$($system.Name)"
-    } 
+    }
   ) #| Sort-Object
   $SystemLabels += 'Done'
   $SystemChoicePrompt = 'Configure the systems below for Autoconnect and/or Associated Credentials:'
@@ -730,7 +730,7 @@ function GetAdminUserProfileCredentialPrompt
         ,
         $editableCredentials
     )
-$prompt = 
+$prompt =
 @"
 You may associate a credential with each of the following systems for auto connection or on demand connections/usage:
 

@@ -1,5 +1,5 @@
-﻿    Function Get-SpecialFolder {
-        
+﻿Function Get-SpecialFolder
+{
     <#
             Original source: https://github.com/gravejester/Communary.ConsoleExtensions/blob/master/Functions/Get-SpecialFolder.ps1
             MIT License
@@ -25,35 +25,17 @@
         #>
     [cmdletbinding(DefaultParameterSetName = 'All')]
     param (
+        [parameter()]
+        [System.Environment+SpecialFolder[]]$Name = [Enum]::GetNames([System.Environment+SpecialFolder])
     )
-    DynamicParam
-    {
-        $Dictionary = New-DynamicParameter -Name 'Name' -Type $([string[]]) -ValidateSet @([Enum]::GetValues([System.Environment+SpecialFolder])) -Mandatory:$true -ParameterSetName 'Selected'
-        Write-Output -InputObject $dictionary
-    }#DynamicParam
-    begin
-    {
-        #Dynamic Parameter to Variable Binding
-        Set-DynamicParameterVariable -dictionary $Dictionary
-        switch ($PSCmdlet.ParameterSetName)
-        {
-            'All'
-            {
-                $Name = [Enum]::GetValues([System.Environment+SpecialFolder])
-            }
-            'Selected'
-            {
-            }
-        }
-        foreach ($folder in $Name)
-        {
-            $FolderObject =
-            [PSCustomObject]@{
-                Name = $folder.ToString()
-                Path = [System.Environment]::GetFolderPath($folder)
-            }
-            Write-Output -InputObject $FolderObject
-        }#foreach
-    }#begin
 
-    }
+    foreach ($folder in $Name)
+    {
+        $FolderObject =
+        [PSCustomObject]@{
+            Name = $folder.ToString()
+            Path = [System.Environment]::GetFolderPath($folder)
+        }
+        $FolderObject
+    }#foreach
+}
