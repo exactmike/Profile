@@ -1,12 +1,14 @@
-﻿    Function Get-MsolUserLicenseDetail {
-        
+﻿Function Get-MsolUserLicenseDetail
+{
+
     [cmdletbinding()]
     param(
         [parameter(ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ParameterSetName = 'UserPrincipalName')]
         [string[]]$UserPrincipalName
         ,
         [parameter(ValueFromPipeline = $true, ParameterSetName = 'MSOLUserObject')]
-        [Microsoft.Online.Administration.User[]]$msoluser
+        #[Microsoft.Online.Administration.User[]]
+        $msoluser
     )
     begin
     {
@@ -16,8 +18,8 @@
             $result += [pscustomobject]@{
                 UserPrincipalName           = $user.UserPrincipalName
                 LicenseAssigned             = $user.Licenses.AccountSKUID
-                EnabledServices             = @($user.Licenses.servicestatus | Select-Object -Property @{n = 'Service'; e = {$_.serviceplan.servicename}}, @{n = 'Status'; e = {$_.provisioningstatus}} | where-object Status -ne 'Disabled' | Select-Object -ExpandProperty Service)
-                DisabledServices            = @($user.Licenses.servicestatus | Select-Object -Property @{n = 'Service'; e = {$_.serviceplan.servicename}}, @{n = 'Status'; e = {$_.provisioningstatus}} | where-object Status -eq 'Disabled' | Select-Object -ExpandProperty Service)
+                EnabledServices             = @($user.Licenses.servicestatus | Select-Object -Property @{n = 'Service'; e = { $_.serviceplan.servicename } }, @{n = 'Status'; e = { $_.provisioningstatus } } | Where-Object Status -ne 'Disabled' | Select-Object -ExpandProperty Service)
+                DisabledServices            = @($user.Licenses.servicestatus | Select-Object -Property @{n = 'Service'; e = { $_.serviceplan.servicename } }, @{n = 'Status'; e = { $_.provisioningstatus } } | Where-Object Status -eq 'Disabled' | Select-Object -ExpandProperty Service)
                 UsageLocation               = $user.UsageLocation
                 LicenseReconciliationNeeded = $user.LicenseReconciliationNeeded
             }#result
@@ -60,4 +62,4 @@
     {
     }#end
 
-    }
+}
