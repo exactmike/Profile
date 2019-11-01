@@ -7,7 +7,7 @@ function Update-ManagedInstall
         [string]$Name
         ,
         [Parameter(ValueFromPipelineByPropertyName)]
-        [string[]]$RequiredVersions
+        [string[]]$RequiredVersion
         ,
         [Parameter(ValueFromPipelineByPropertyName)]
         [bool]$AutoUpgrade
@@ -16,10 +16,11 @@ function Update-ManagedInstall
         [bool]$AutoRemove
         ,
         [Parameter(ValueFromPipelineByPropertyName)]
-        [String[]]$ExemptMachines
+        [String[]]$ExemptMachine
         ,
         [Parameter(ValueFromPipelineByPropertyName)]
-        $AdditionalParameters
+        [Alias('Parameter')]
+        $AdditionalParameter
         ,
         [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
         [InstallManager]$InstallManager
@@ -35,7 +36,7 @@ function Update-ManagedInstall
 
     process
     {
-        if ($localmachinename -notin $ExemptMachines)
+        if ($localmachinename -notin $ExemptMachine)
         {
             Write-Information -MessageData "Using $InstallManager to Process Install Definition: $Name"
             switch ($InstallManager)
@@ -50,9 +51,9 @@ function Update-ManagedInstall
                         AcceptLicense = $true
                         AllowClobber  = $true
                     }
-                    if (-not [string]::IsNullOrEmpty($AdditionalParameters))
+                    if (-not [string]::IsNullOrEmpty($AdditionalParameter))
                     {
-                        foreach ($ap in $AdditionalParameters.split(';'))
+                        foreach ($ap in $AdditionalParameter.split(';'))
                         {
                             $parameter, $value = $ap.split(' ')
                             $installModuleParams.$parameter = $value
@@ -72,10 +73,10 @@ function Update-ManagedInstall
                             #notification/logging that a new version is available
                         }
                     }
-                    if ($RequiredVersions.Count -ge 1)
+                    if ($RequiredVersion.Count -ge 1)
                     {
                         $installedModuleInfo = Get-InstalledModuleInfo -Name $Name
-                        foreach ($rv in $RequiredVersions)
+                        foreach ($rv in $RequiredVersion)
                         {
                             if ($rv -notin $installedModuleInfo.AllInstalledVersions)
                             {
@@ -88,7 +89,7 @@ function Update-ManagedInstall
                     {
                         $installedModuleInfo = Get-InstalledModuleInfo -Name $Name
                         [System.Collections.ArrayList]$keepVersions = @()
-                        $RequiredVersions.ForEach( { $keepVersions.add($_) }) | Out-Null
+                        $RequiredVersion.ForEach( { $keepVersions.add($_) }) | Out-Null
                         if ($true -eq $autoupgrade)
                         {
                             $keepVersions.add($installedModuleInfo.LatestRepositoryVersion) | Out-Null
@@ -112,9 +113,9 @@ function Update-ManagedInstall
                 {
                     $installedModuleInfo = Get-InstalledByChoco -Name $Name
                     $options = ''
-                    if (-not [string]::IsNullOrEmpty($AdditionalParameters))
+                    if (-not [string]::IsNullOrEmpty($AdditionalParameter))
                     {
-                        foreach ($ap in $AdditionalParameters.split(';'))
+                        foreach ($ap in $AdditionalParameter.split(';'))
                         {
                             $parameter, $value = $ap.split(' ')
                             $options += "--$parameter"
@@ -134,14 +135,14 @@ function Update-ManagedInstall
                         {
                             if ($false -eq $installedModuleInfo.IsLatestVersion -or $null -eq $installedModuleInfo.IsLatestVersion)
                             {
-                                Invoke-Command -ScriptBlock $([scriptblock]::Create("choco upgrade $Name --Yes --LimitOutput"))
+                                Invoke-Command -ScriptBlock $([scriptblock]::Create("choco upgrade $Name --Yes --LimitOutput $options"))
                             }
                         }
                         $false
                         {
                             if ($null -eq $installedModuleInfo)
                             {
-                                Invoke-Command -ScriptBlock $([scriptblock]::Create("choco upgrade $Name --Yes --LimitOutput"))
+                                Invoke-Command -ScriptBlock $([scriptblock]::Create("choco upgrade $Name --Yes --LimitOutput $options"))
                             }
                             #notification/logging that a new version is available
                         }

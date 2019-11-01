@@ -6,7 +6,7 @@ Function Import-ManagedInstallDefinition
         $Path
     )
     $ManagedInstalls = @(Import-Csv -Path $Path)
-    $RequiredProperties = @('Name', 'InstallManager', 'RequiredVersions', 'AutoUpgrade', 'AutoRemove', 'ExemptMachines', 'Parameters', 'Repository')
+    $RequiredProperties = @('Name', 'InstallManager', 'RequiredVersion', 'AutoUpgrade', 'AutoRemove', 'ExemptMachine', 'Parameter', 'Repository')
     if (
         @(
             foreach ($rp in $RequiredProperties)
@@ -18,7 +18,7 @@ Function Import-ManagedInstallDefinition
     {
         foreach ($mi in $ManagedInstalls)
         {
-            Convert-StringBoolToBool -object $mi -IncludeProperty 'AutoUpgrade','AutoRemove'
+            Convert-StringBoolToBool -object $mi -IncludeProperty 'AutoUpgrade', 'AutoRemove'
         }
         $Script:ManagedInstalls = $ManagedInstalls
     }
