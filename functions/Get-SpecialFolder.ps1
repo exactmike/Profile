@@ -25,17 +25,19 @@
         #>
     [cmdletbinding(DefaultParameterSetName = 'All')]
     param (
-        [parameter()]
+        [parameter(ValueFromPipeline)]
         [System.Environment+SpecialFolder[]]$Name = [Enum]::GetNames([System.Environment+SpecialFolder])
     )
-
-    foreach ($folder in $Name)
+    process
     {
-        $FolderObject =
-        [PSCustomObject]@{
-            Name = $folder.ToString()
-            Path = [System.Environment]::GetFolderPath($folder)
+        foreach ($folder in $Name)
+        {
+            $FolderObject =
+            [PSCustomObject]@{
+                Name = $folder.ToString()
+                Path = [System.Environment]::GetFolderPath($folder)
+            }
+            $FolderObject
         }
-        $FolderObject
-    }#foreach
+    }
 }
