@@ -1,5 +1,6 @@
-﻿    Function Find-ADContact {
-        
+﻿Function Find-ADContact
+{
+
     [cmdletbinding()]
     param(
         [parameter(Mandatory = $true, valuefrompipeline = $true, valuefrompipelinebypropertyname = $true)]
@@ -18,7 +19,7 @@
         ,
         [switch]$ReportExceptions
     )#param
-    DynamicParam
+    <#     DynamicParam
     {
         $NewDynamicParameterParams = @{
             Name        = 'ActiveDirectoryInstance'
@@ -28,13 +29,13 @@
         }
         $Dictionary = New-DynamicParameter @NewDynamicParameterParams
         Write-Output -InputObject $Dictionary
-    }#DynamicParam
+    }#DynamicParam #>
     Begin
     {
         #Dynamic Parameter to Variable Binding
-        Set-DynamicParameterVariable -dictionary $Dictionary
+        #Set-DynamicParameterVariable -dictionary $Dictionary
         $ADInstance = $ActiveDirectoryInstance
-        if ($DoNotPreserveLocation -ne $true) {Push-Location -StackName 'Find-ADContact'}
+        if ($DoNotPreserveLocation -ne $true) { Push-Location -StackName 'Find-ADContact' }
         try
         {
             #Write-Log -Message "Attempting: Set Location to AD Drive $("$ADInstance`:")" -Verbose
@@ -48,7 +49,7 @@
             $ErrorRecord = New-ErrorRecord -Exception 'System.Exception' -ErrorId ADDriveNotAvailable -ErrorCategory NotSpecified -TargetObject $ADInstance -Message 'Required AD Drive not available'
             $PSCmdlet.ThrowTerminatingError($ErrorRecord)
         }
-        $GetADObjectParams = @{ErrorAction = 'Stop'}
+        $GetADObjectParams = @{ErrorAction = 'Stop' }
         if ($properties.count -ge 1)
         {
             #Write-Log -Message "Using Property List: $($properties -join ",") with Get-ADObject"
@@ -76,40 +77,40 @@
                     'ProxyAddress'
                     {
                         #$wildcardID = "*$ID*"
-                        $ADContact = @(Get-ADObject -filter {objectclass -eq 'contact' -and proxyaddresses -like $ID} @GetADObjectParams)
+                        $ADContact = @(Get-ADObject -filter { objectclass -eq 'contact' -and proxyaddresses -like $ID } @GetADObjectParams)
                     }
                     'Mail'
                     {
-                        $ADContact = @(Get-ADObject -filter {objectclass -eq 'contact' -and Mail -eq $ID}  @GetADObjectParams)
+                        $ADContact = @(Get-ADObject -filter { objectclass -eq 'contact' -and Mail -eq $ID }  @GetADObjectParams)
                     }
                     'extensionattribute5'
                     {
-                        $ADContact = @(Get-ADObject -filter {objectclass -eq 'contact' -and extensionattribute5 -eq $ID} @GetADObjectParams)
+                        $ADContact = @(Get-ADObject -filter { objectclass -eq 'contact' -and extensionattribute5 -eq $ID } @GetADObjectParams)
                     }
                     'extensionattribute11'
                     {
-                        $ADContact = @(Get-ADObject -filter {objectclass -eq 'contact' -and extensionattribute11 -eq $ID} @GetADObjectParams)
+                        $ADContact = @(Get-ADObject -filter { objectclass -eq 'contact' -and extensionattribute11 -eq $ID } @GetADObjectParams)
                     }
                     'extensionattribute13'
                     {
-                        $ADContact = @(Get-ADObject -filter {objectclass -eq 'contact' -and extensionattribute13 -eq $ID} @GetADObjectParams)
+                        $ADContact = @(Get-ADObject -filter { objectclass -eq 'contact' -and extensionattribute13 -eq $ID } @GetADObjectParams)
                     }
                     'DistinguishedName'
                     {
-                        $ADContact = @(Get-ADObject -filter {objectclass -eq 'contact' -and DistinguishedName -eq $ID} @GetADObjectParams)
+                        $ADContact = @(Get-ADObject -filter { objectclass -eq 'contact' -and DistinguishedName -eq $ID } @GetADObjectParams)
                     }
                     'CanonicalName'
                     {
-                        $ADContact = @(Get-ADObject -filter {objectclass -eq 'contact' -and CanonicalName -eq $ID} @GetADObjectParams)
+                        $ADContact = @(Get-ADObject -filter { objectclass -eq 'contact' -and CanonicalName -eq $ID } @GetADObjectParams)
                     }
                     'ObjectGUID'
                     {
-                        $ADContact = @(Get-ADObject -filter {objectclass -eq 'contact' -and ObjectGUID -eq $ID} @GetADObjectParams)
+                        $ADContact = @(Get-ADObject -filter { objectclass -eq 'contact' -and ObjectGUID -eq $ID } @GetADObjectParams)
                     }
                     'mS-DS-ConsistencyGuid'
                     {
                         $ID = [byte[]]$ID.split(' ')
-                        $ADContact = @(Get-ADObject -filter {objectclass -eq 'contact' -and mS-DS-ConsistencyGuid -eq $ID} @GetADObjectParams)
+                        $ADContact = @(Get-ADObject -filter { objectclass -eq 'contact' -and mS-DS-ConsistencyGuid -eq $ID } @GetADObjectParams)
                     }
                 }#switch
                 Write-Log -Message "Succeeded: Get-ADObject with identifier $ID for Attribute $IdentityType"
@@ -118,7 +119,7 @@
             {
                 Write-Log -Message "FAILED: Get-ADObject with identifier $ID for Attribute $IdentityType" -Verbose -ErrorLog
                 Write-Log -Message $_.tostring() -ErrorLog
-                if ($ReportExceptions) {$Script:LookupADContactNotFound += $ID}
+                if ($ReportExceptions) { $Script:LookupADContactNotFound += $ID }
             }
             switch ($ADContact.Count)
             {
@@ -129,7 +130,7 @@
                 }#1
                 0
                 {
-                    if ($ReportExceptions) {$Script:LookupADContactNotFound += $ID}
+                    if ($ReportExceptions) { $Script:LookupADContactNotFound += $ID }
                 }#0
                 Default
                 {
@@ -140,7 +141,7 @@
                     }
                     else
                     {
-                        if ($ReportExceptions) {$Script:LookupADContactAmbiguous += $ID}
+                        if ($ReportExceptions) { $Script:LookupADContactAmbiguous += $ID }
                     }
                 }#Default
             }#switch
@@ -161,7 +162,7 @@
                 Write-Log -Message "$($Script:LookupADContactAmbiguous -join "`n`t")" -ErrorLog
             }#if
         }#if
-        if ($DoNotPreserveLocation -ne $true) {Pop-Location -StackName 'Find-ADContact'}#if
+        if ($DoNotPreserveLocation -ne $true) { Pop-Location -StackName 'Find-ADContact' }#if
     }#end
 
-    }
+}

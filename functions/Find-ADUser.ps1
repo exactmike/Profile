@@ -1,5 +1,6 @@
-﻿    Function Find-ADUser {
-        
+﻿Function Find-ADUser
+{
+
     [cmdletbinding(DefaultParameterSetName = 'Default')]
     param(
         [parameter(Mandatory = $true, valuefrompipeline = $true, valuefrompipelinebypropertyname = $true, ParameterSetName = 'Default')]
@@ -24,7 +25,7 @@
         ,
         [switch]$ReportExceptions
     )#param
-    DynamicParam
+    <#     DynamicParam
     {
         $NewDynamicParameterParams = @{
             Name        = 'ADInstance'
@@ -34,13 +35,13 @@
         }
         $Dictionary = New-DynamicParameter @NewDynamicParameterParams -Type []
         Write-Output -InputObject $Dictionary
-    }#DynamicParam
+    }#DynamicParam #>
     Begin
     {
         #Dynamic Parameter to Variable Binding
-        Set-DynamicParameterVariable -dictionary $Dictionary
+        #Set-DynamicParameterVariable -dictionary $Dictionary
         $ADInstance = $ActiveDirectoryInstance
-        if ($DoNotPreserveLocation -ne $true) {Push-Location -StackName 'Lookup-ADUser'}
+        if ($DoNotPreserveLocation -ne $true) { Push-Location -StackName 'Lookup-ADUser' }
         #validate AD Instance
         try
         {
@@ -56,7 +57,7 @@
             $PSCmdlet.ThrowTerminatingError($ErrorRecord)
         }
         #Setup GetADUserParams
-        $GetADUserParams = @{ErrorAction = 'Stop'}
+        $GetADUserParams = @{ErrorAction = 'Stop' }
         if ($properties.count -ge 1)
         {
             #Write-Log -Message "Using Property List: $($properties -join ",") with Get-ADUser"
@@ -83,7 +84,7 @@
                 $GivenName = $GivenName.Trim()
                 $Identity = "$SurName, $GivenName"
             }
-            Default {}
+            Default { }
         }
         foreach ($ID in $Identity)
         {
@@ -94,69 +95,69 @@
                 {
                     'SAMAccountName'
                     {
-                        $ADUser = @(Get-ADUser -filter {SAMAccountName -eq $ID} @GetADUserParams)
+                        $ADUser = @(Get-ADUser -filter { SAMAccountName -eq $ID } @GetADUserParams)
                     }
                     'UserPrincipalName'
                     {
-                        $AdUser = @(Get-ADUser -filter {UserPrincipalName -eq $ID} @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { UserPrincipalName -eq $ID } @GetADUserParams)
                     }
                     'ProxyAddress'
                     {
                         #$wildcardID = "*$ID*"
-                        $AdUser = @(Get-ADUser -filter {proxyaddresses -like $ID} @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { proxyaddresses -like $ID } @GetADUserParams)
                     }
                     'Mail'
                     {
-                        $AdUser = @(Get-ADUser -filter {Mail -eq $ID}  @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { Mail -eq $ID }  @GetADUserParams)
                     }
                     'mailNickname'
                     {
-                        $AdUser = @(Get-ADUser -filter {mailNickname -eq $ID}  @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { mailNickname -eq $ID }  @GetADUserParams)
                     }
                     'extensionattribute5'
                     {
-                        $AdUser = @(Get-ADUser -filter {extensionattribute5 -eq $ID} @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { extensionattribute5 -eq $ID } @GetADUserParams)
                     }
                     'extensionattribute11'
                     {
-                        $AdUser = @(Get-ADUser -filter {extensionattribute11 -eq $ID} @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { extensionattribute11 -eq $ID } @GetADUserParams)
                     }
                     'extensionattribute13'
                     {
-                        $AdUser = @(Get-ADUser -filter {extensionattribute13 -eq $ID} @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { extensionattribute13 -eq $ID } @GetADUserParams)
                     }
                     'DistinguishedName'
                     {
-                        $AdUser = @(Get-ADUser -filter {DistinguishedName -eq $ID} @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { DistinguishedName -eq $ID } @GetADUserParams)
                     }
                     'CanonicalName'
                     {
-                        $AdUser = @(Get-ADUser -filter {CanonicalName -eq $ID} @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { CanonicalName -eq $ID } @GetADUserParams)
                     }
                     'ObjectGUID'
                     {
-                        $AdUser = @(Get-ADUser -filter {ObjectGUID -eq $ID} @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { ObjectGUID -eq $ID } @GetADUserParams)
                     }
                     'SID'
                     {
-                        $AdUser = @(Get-ADUser -filter {SID -eq $ID} @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { SID -eq $ID } @GetADUserParams)
                     }
                     'mS-DS-ConsistencyGuid'
                     {
                         $ID = [byte[]]$ID.split(' ')
-                        $AdUser = @(Get-ADUser -filter {mS-DS-ConsistencyGuid -eq $ID} @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { mS-DS-ConsistencyGuid -eq $ID } @GetADUserParams)
                     }
                     'GivenNameSurName'
                     {
-                        $ADUser = @(Get-ADUser -Filter {GivenName -eq $GivenName -and Surname -eq $SurName} @GetADUserParams)
+                        $ADUser = @(Get-ADUser -Filter { GivenName -eq $GivenName -and Surname -eq $SurName } @GetADUserParams)
                     }
                     'employeeNumber'
                     {
-                        $AdUser = @(Get-ADUser -filter {employeeNumber -eq $ID}  @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { employeeNumber -eq $ID }  @GetADUserParams)
                     }
                     'employeeID'
                     {
-                        $AdUser = @(Get-ADUser -filter {employeeID -eq $ID}  @GetADUserParams)
+                        $AdUser = @(Get-ADUser -filter { employeeID -eq $ID }  @GetADUserParams)
                     }
                 }#switch
                 Write-Log -Message "Succeeded: Get-ADUser with identifier $ID for Attribute $IdentityType"
@@ -165,7 +166,7 @@
             {
                 Write-Log -Message "FAILED: Get-ADUser with identifier $ID for Attribute $IdentityType" -Verbose -ErrorLog
                 Write-Log -Message $_.tostring() -ErrorLog
-                if ($ReportExceptions) {$Script:LookupADUserNotFound += $ID}
+                if ($ReportExceptions) { $Script:LookupADUserNotFound += $ID }
             }
             switch ($aduser.Count)
             {
@@ -176,7 +177,7 @@
                 }#1
                 0
                 {
-                    if ($ReportExceptions) {$Script:LookupADUserNotFound += $ID}
+                    if ($ReportExceptions) { $Script:LookupADUserNotFound += $ID }
                 }#0
                 Default
                 {
@@ -187,7 +188,7 @@
                     }
                     else
                     {
-                        if ($ReportExceptions) {$Script:LookupADUserAmbiguous += $ID}
+                        if ($ReportExceptions) { $Script:LookupADUserAmbiguous += $ID }
                     }
                 }#Default
             }#switch
@@ -208,7 +209,7 @@
                 Write-Log -Message "$($Script:LookupADUserAmbiguous -join "`n`t")" -ErrorLog
             }#if
         }#if
-        if ($DoNotPreserveLocation -ne $true) {Pop-Location -StackName 'Lookup-ADUser'}#if
+        if ($DoNotPreserveLocation -ne $true) { Pop-Location -StackName 'Lookup-ADUser' }#if
     }#end
 
-    }
+}
