@@ -1,29 +1,25 @@
-﻿    Function Test-ExchangeCommandExists {
-        
+﻿Function Test-ExchangeCommandExists
+{
+
     [cmdletbinding(DefaultParameterSetName = 'Organization')]
     param(
         [parameter(Mandatory, Position = 1)]
-        [ValidateScript( {$_ -like '*-*'})]
+        [ValidateScript( { $_ -like '*-*' })]
         [string]$cmdlet
         ,
         [switch]$checkConnection
+        ,
+        [string]$ExchangeOrganization
     )#Param
-    DynamicParam
-    {
-        $Dictionary = New-ExchangeOrganizationDynamicParameter -ParameterSetName 'Organization' -Mandatory
-        Write-Output -InputObject $Dictionary
-    }#DynamicParam
     begin
     {
-        #Dynamic Parameter to Variable Binding
-        Set-DynamicParameterVariable -dictionary $Dictionary
         # Bind the dynamic parameter to a friendly variable
-        $orgobj = $Script:CurrentOrgAdminProfileSystems |  Where-Object SystemType -eq 'ExchangeOrganizations' | Where-Object {$_.name -eq $ExchangeOrganization}
+        $orgobj = $Script:CurrentOrgAdminProfileSystems | Where-Object SystemType -eq 'ExchangeOrganizations' | Where-Object { $_.name -eq $ExchangeOrganization }
         $CommandPrefix = $orgobj.CommandPrefix
         if ($checkConnection -eq $true)
         {
             if ((Connect-Exchange -exchangeorganization $ExchangeOrganization) -ne $true)
-            {throw ("Connection to Exchange Organization $ExchangeOrganization failed.")}
+            { throw ("Connection to Exchange Organization $ExchangeOrganization failed.") }
         }
     }#begin
     Process
@@ -35,4 +31,4 @@
         Test-CommandExists -command $commandstring
     }#Process
 
-    }
+}
