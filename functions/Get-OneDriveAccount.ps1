@@ -45,8 +45,26 @@
                     $_.ConfiguredTenantId -in @($TenantID.foreach( { $_.guid }))
                 )
             }
+        ).foreach(
+            {
+                $OutputObjectHash = [ordered]@{ }
+                @($_.PSObject.properties | Sort-Object -Property Name).where( { $_.Name -cnotlike 'PS*' }).foreach( { $OutputObjectHash.$($_.Name) = $_.Value })
+                switch ($OutputObjectHash.Business)
+                {
+                    1
+                    {
+                        $OutputObjectHash.Insert(0, 'AccountType' , 'Business')
+                    }
+                    $null
+                    {
+                        $OutputObjectHash.Insert(0, 'AccountType' , 'Personal')
+                    }
+                }
+                New-Object -Property $OutputObjectHash -TypeName PSCustomObject
+            }
+        ).where(
+            { $Null -ne $_.UserEmail }
         )
-
     }
 
 }
