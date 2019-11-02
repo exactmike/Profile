@@ -48,7 +48,14 @@
         ).foreach(
             {
                 $OutputObjectHash = [ordered]@{ }
-                @($_.PSObject.properties | Sort-Object -Property Name).where( { $_.Name -cnotlike 'PS*' }).foreach( { $OutputObjectHash.$($_.Name) = $_.Value })
+                @($_.PSObject.properties | Sort-Object -Property Name).foreach(
+                    {
+                        $OutputObjectHash.$($_.Name) = $_.Value
+                    }
+                )
+                $OutputObjectHash.RegistryPath = $OutputObjectHash.PSPath
+                $ToRemove = $OutputObjectHash.Keys.where( { $_ -clike 'PS*' })
+                $ToRemove.foreach( { $OutputObjectHash.Remove($_) })
                 switch ($OutputObjectHash.Business)
                 {
                     1
