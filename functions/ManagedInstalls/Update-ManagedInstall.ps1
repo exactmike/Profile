@@ -56,6 +56,7 @@ function Update-ManagedInstall
                         foreach ($ap in $AdditionalParameter.split(';'))
                         {
                             $parameter, $value = $ap.split(' ')
+                            switch ($value) { 'TRUE' { $value = $true } 'FALSE' { $value = $false } }
                             $installModuleParams.$parameter = $value
                         }
                     }
