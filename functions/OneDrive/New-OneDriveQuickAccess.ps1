@@ -2,7 +2,7 @@ function New-OneDriveQuickAccess
 {
     [cmdletbinding()]
     param(
-        [parameter(Mandatory)]
+        [parameter(Mandatory,ValueFromPipeline)]
         [psobject]$OneDriveAccount
         ,
         [parameter(Mandatory)]
