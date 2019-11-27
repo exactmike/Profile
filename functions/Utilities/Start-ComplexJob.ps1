@@ -1,5 +1,5 @@
-﻿    Function Start-ComplexJob {
-        
+﻿Function Start-ComplexJob
+{
     <#
         .SYNOPSIS
         Helps Start Complex Background Jobs with many arguments and functions using Start-Job.
@@ -67,4 +67,4 @@
     #$startjobparams.initializationscript = $initializationscript
     Start-Job @StartJobParams
 
-    }
+}
