@@ -1,6 +1,7 @@
 #requires -Version 2 -Modules posh-git
 
-function Write-Theme {
+function Write-Theme
+{
     param(
         [bool]
         $lastCommandFailed,
@@ -9,17 +10,20 @@ function Write-Theme {
     )
 
     #check the last command state and indicate if failed
-    If ($lastCommandFailed) {
+    If ($lastCommandFailed)
+    {
         $prompt = Write-Prompt -Object "$($sl.PromptSymbols.FailedCommandSymbol) " -ForegroundColor $sl.Colors.CommandFailedIconForegroundColor
     }
 
     #check for elevated prompt
-    If (Test-Administrator) {
+    If (Test-Administrator)
+    {
         $prompt += Write-Prompt -Object "$($sl.PromptSymbols.ElevatedSymbol) " -ForegroundColor $sl.Colors.AdminIconForegroundColor
     }
 
     $user = $sl.CurrentUser
-    if (Test-NotDefaultUser($user)) {
+    if (Test-NotDefaultUser($user))
+    {
         $prompt += Write-Prompt -Object "$user " -ForegroundColor $sl.Colors.PromptForegroundColor
     }
 
@@ -27,19 +31,15 @@ function Write-Theme {
     $prompt += Write-Prompt -Object "$(Get-ShortPath -dir $pwd) " -ForegroundColor $sl.Colors.DriveForegroundColor
 
     $status = Get-VCSStatus
-    if ($status) {
+    if ($status)
+    {
         $themeInfo = Get-VcsInfo -status ($status)
         $prompt += Write-Prompt -Object "git:" -ForegroundColor $sl.Colors.PromptForegroundColor
         $prompt += Write-Prompt -Object "$($themeInfo.VcInfo) " -ForegroundColor $themeInfo.BackgroundColor
     }
 
-    # write virtualenv
-    if (Test-VirtualEnv) {
-        $prompt += Write-Prompt -Object 'env:' -ForegroundColor $sl.Colors.PromptForegroundColor
-        $prompt += Write-Prompt -Object "$(Get-VirtualEnvName) " -ForegroundColor $themeInfo.VirtualEnvForegroundColor
-    }
-
-    if ($with) {
+    if ($with)
+    {
         $prompt += Write-Prompt -Object "$($with.ToUpper()) " -BackgroundColor $sl.Colors.WithBackgroundColor -ForegroundColor $sl.Colors.WithForegroundColor
     }
 
