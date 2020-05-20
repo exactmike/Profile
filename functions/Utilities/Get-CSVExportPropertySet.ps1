@@ -50,32 +50,32 @@
         [switch]$Sort
     )
     $ADUserPropertiesToSuppress = @('CanonicalName', 'DistinguishedName')
-    $CSVExportPropertySet = @()
-    foreach ($mv in $MultiValuedAttributes)
-    {
-        $ExpressionString = "`$(`$_." + $mv
-
-        if ($true -eq $Sort)
+    $CustomProperties = @(
+        foreach ($mv in $MultiValuedAttributes)
         {
-            $ExpressionString = $ExpressionString + ' | Sort-Object)'
-        }
-        else
-        {
-            ')'
-        }
+            $ExpressionString = "`$(`$_." + $mv
 
-        $ExpressionString = $ExpressionString + " -join '$Delimiter'"
+            if ($true -eq $Sort)
+            {
+                $ExpressionString = $ExpressionString + ' | Sort-Object ) '
+            }
+            else
+            {
+                $ExpressionString = $ExpressionString + ')'
+            }
 
-        $CSVExportPropertySet +=
-        @{
-            n = $mv
-            e = [scriptblock]::Create($ExpressionString)
-        }
-    }#foreach
+            $ExpressionString = $ExpressionString + " -join '$Delimiter'"
+
+            @{
+                n = $mv
+                e = [scriptblock]::Create($ExpressionString)
+            }
+        }#foreach
+    )
 
     $outputPropertySet =
-    if ($SuppressCommonADProperties) { ($ScalarAttributes | Where-Object { $ADUserPropertiesToSuppress -notcontains $_ }) + $CSVExportPropertySet }
-    else { $ScalarAttributes + $CSVExportPropertySet }
+    if ($SuppressCommonADProperties) { ($ScalarAttributes | Where-Object { $ADUserPropertiesToSuppress -notcontains $_ }) + $CustomProperties }
+    else { $ScalarAttributes + $CustomProperties }
 
     $outputPropertySet
 
