@@ -88,11 +88,11 @@ Function Send-OutlookMail
     }
     End
     {
-        if ($outlookWasAlreadyRunning -eq $false)
-        {
-            $Outlook.Quit()
-        }
-        $null = [System.Runtime.Interopservices.Marshal]::ReleaseComObject($Outlook)
-        $Outlook = $null
+        #if ($outlookWasAlreadyRunning -eq $false)
+        #{
+        #    $Outlook.Quit()
+        #}
+        #$null = [System.Runtime.Interopservices.Marshal]::ReleaseComObject($Outlook)
+        #$Outlook = $null
     }
 }
