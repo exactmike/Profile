@@ -26,6 +26,10 @@ Function Send-OutlookMail
         [parameter()]
         [alias('SendOnBehalf')]
         [string]$SendAS #the Actual 'Send As' or 'SendOnBehalf' will depend on the permissions held by the sending account.
+        ,
+        [parameter()]
+        [validateset('Normal', 'High', 'Low')]
+        [string]$Priority
     )
     Begin
     {
@@ -79,6 +83,18 @@ Function Send-OutlookMail
                 $a.PropertyAccessor.SetProperty("http://schemas.microsoft.com/mapi/proptag/0x3712001F", $filename)
             })
 
+        if ($PSBoundParameters.ContainsKey('Priority'))
+        {
+            switch ($Priority)
+            {
+                'Normal'
+                { $Mail.Importance = 1 }
+                'High'
+                { $Mail.Importance = 2 }
+                'Low'
+                { $Mail.Importance = 0 }
+            }
+        }
         if (-not [string]::IsNullOrWhiteSpace($SendAs))
         {
             $mail.SentOnBehalfOfName = $SendAs
