@@ -17,6 +17,7 @@ function Search-FileIndex
     Uses the Windows Search index to search for files.
     SQL Syntax documented at https://msdn.microsoft.com/en-us/library/windows/desktop/bb231256(v=vs.85).aspx
     Based on https://blogs.msdn.microsoft.com/mediaandmicrocode/2008/07/13/microcode-windows-powershell-windows-desktop-search-problem-solving/
+    From: https://gist.github.com/arebee/1928da03047aee4167fabee0f501c72d
     .OUTPUTS
     By default one string per file found with full path.
     If the AsFSInfo switch is set, one System.IO.FileSystemInfo object per file found is returned.
