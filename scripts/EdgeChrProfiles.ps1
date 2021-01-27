@@ -16,7 +16,7 @@ $EdgeProfiles = $EdgeProfileDirectories.fullname.foreach( {
 $EdgeProfiles.foreach( {
         $p = $_
         $ProfileName = $p.profile.name
-        switch (Read-Choice -Choices "Yes", "No" -Title "Create Edge Profile Shortcut?" -Message "Do you want to create a shortcut for Edge Profile $ProfileName" -DefaultChoice 0)
+        switch (Read-PromptForChoice -Choices "Yes", "No" -Title "Create Edge Profile Shortcut?" -Message "Do you want to create a shortcut for Edge Profile $ProfileName" -DefaultChoice 0)
         {
             0
             {
