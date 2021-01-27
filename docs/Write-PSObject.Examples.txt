@@ -1,0 +1,272 @@
+
+#region XML Data Sample
+$xml = [XML] "<Servers><Server SN='01' Server='SPWFE01' IP='192.168.0.10' Manufacture='HP' MemoryMB='32768' FreeMemoryMB= '10240' CPUCores='8' HyperThreading='False' Virtualization='Disabled' HyperVSupport='True' /><Server SN='02' Server='SPWFE02' IP='192.168.1.3' Manufacture='Dell' MemoryMB='32768' FreeMemoryMB= '30720' CPUCores='8' HyperThreading='True' Virtualization='Disabled' HyperVSupport='True' /><Server SN='03' Server='SPWFE03' IP='192.168.0.22' Manufacture='HP' MemoryMB='32768' FreeMemoryMB= '510' CPUCores='8' HyperThreading='True' Virtualization='Disabled' HyperVSupport='False' /><Server SN='04' Server='SQLPR01' IP='192.168.1.5' Manufacture='HP' MemoryMB='65536' FreeMemoryMB= '5120' CPUCores='16' HyperThreading='True' Virtualization='Enabled' HyperVSupport='True' /><Server SN='05' Server='SQLMI01' IP='192.168.1.6' Manufacture='Dell' MemoryMB='65536' FreeMemoryMB= '6420' CPUCores='16' HyperThreading='False' Virtualization='Enabled' HyperVSupport='True' /></Servers>";
+$servers = [PSObject[]] $xml.Servers.Server  | Select SN, Server, IP, Manufacture, MemoryMB, FreeMemoryMB, CPUCores, HyperThreading, Virtualization, HyperVSupport;
+#endregion XML Data Sample
+Write-PSObject $servers;
+
+# Examples:
+# ---------
+# General Formatting
+# ------------------
+
+
+# Example 01: Display the input object as it is without any formatting (Would act exactly as Write-Output):
+# --------------------------------------------------------------------------------------------------------
+Write-PSObject -object $servers;
+# ----- Or -----
+Write-PSObject $servers;
+# ----- Or -----
+$servers | Write-PSObject;
+
+# Example 02: Display the body rows/lines (values) only:
+# ------------------------------------------------------
+Write-PSObject -Object $servers -BodyOnly;
+# ----- Or -----
+Write-PSObject $servers -BodyOnly;
+# ----- Or -----
+$servers | Write-PSObject -BodyOnly;
+
+# Example 03: Display the Headers only:
+# ------------------------------------
+Write-PSObject $servers -HeadersOnly;
+
+# Example 04: Display the Headers only and remove the header separator line (display only row/line which displays the columns/properties name):
+# --------------------------------------------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -HeadersOnly -RemoveHeadersSeparator;
+
+# Example 05: Display the Headers with White forecolor, and, Blue background color.
+#            And the body rows/lines (values) with Yellow forecolor, and, DarkRed background color.
+# ---------------------------------------------------------------------------------------------
+Write-PSObject $servers -BodyForeColor Yellow -BodyBackColor DarkRed -HeadersForeColor White -HeadersBackColor Blue;
+
+# Example 06: Display the input object as formatted table which displays each row/line in odd sequence (starting with the first body row) with cyan forecolor.
+#             Also, display each row/line in even sequence (starting with the second body row) with "Yellow" Fore Color.
+# --------------------------------------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -FormatTableColor -OddRowForeColor Cyan -EvenRowForeColor Yellow;
+
+# Example 07: Display the input object as formatted table which displays each row/line in odd sequence (starting with the first body row) with DarkRed background color.
+#             Also, display each row/line in even sequence (starting with the second body row) with Blue background color.
+# --------------------------------------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -FormatTableColor -OddRowBackColor DarkRed -EvenRowBackColor Blue;
+
+
+# Example 08: Display the input object as formatted table which displays each row/line in odd sequence (starting with the first body row) with Black forecolor and White background color.
+#             Also, display each row/line in even sequence (starting with the second body row) with "Yellow" Fore Color and Blue background color.
+# --------------------------------------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -FormatTableColor -OddRowForeColor Black -OddRowBackColor White -EvenRowForeColor Yellow -EvenRowBackColor Blue;
+
+# Example 09: Display the table with new linefeed between values/body rows/lines:
+# -------------------------------------------------------------------------------
+Write-PSObject $servers -InjectRowsSeparator;
+
+# Example 10: Display the table with new line of underscore characters ("_") between the values/body rows/lines:
+# --------------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -InjectRowsSeparator -RowsSeparator "_";
+
+# Example 11: Display the table with new dotted line between the values/body rows/lines with forecolor Cyan:
+# ----------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -InjectRowsSeparator -RowsSeparator "." -RowsSeparatorForeColor Cyan;
+
+# Example 12: Display the table with new line of white spaces (" ") between the values/body rows/lines with background color White:
+# ---------------------------------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -InjectRowsSeparator -RowsSeparator " " -RowsSeparatorBackColor White;
+
+# Example 13: Display the table with new line of combination of characters ("=*=.-^*") between the values/body rows/lines with forecolor Black and background color White:
+# --------------------------------------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -InjectRowsSeparator -RowsSeparator "=*=.-^*" -RowsSeparatorForeColor Black -RowsSeparatorBackColor White;
+
+# Example 14: Replace the headers separator line/row (dashed line) with the equal character ("=") instead of the hyphen character ("-") with fore color Black, background color Yellow.
+# --------------------------------------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -HeadersSeparator "=" -HeadersSeparatorForeColor Black -HeadersSeparatorBackColor Yellow;
+
+# Example 15: Display the table after forcing resizing the host PowerShell Window and changing the whole host forecolor (Green) and background color (Black).
+# ---------------------------------------------------------------------------------
+Write-PSObject $servers -HostWindowWidth 150 -HostWindowHeight 50 -HostWindowForeColor Green -HostWindowBackColor Black;
+
+
+# Example 16: Display the values of the column/property SN with Blue forecolor and the values column/property CPUCores with Yellow forecolor:
+# ---------------------------------------------------------------------------------
+Write-PSObject $servers -ColoredColumns "SN", "CPUCores" -ColumnForeColor Cyan, Yellow;
+
+
+# Conditional Formatting:
+# -----------------------
+# Example CF01:
+# Column: *
+# Condition: Any property with value equals to $False
+# Query: N/A
+# Value Fore Color: Red
+# Value Back Color: N/A
+# Row Fore Color: N/A
+# Row Back Color: N/A
+# ----------------------------------------------------------------------------
+Write-PSObject $servers -MatchMethod Exact -Column * -Value $false -ValueForeColor Red;
+
+# Example CF02:
+# Column: Server
+# Condition: Server matches "WFE"
+# Query: 'Server' -Match 'WFE'
+# Value Fore Color: White
+# Value Back Color: Blue
+# Row Fore Color: N/A
+# Row Back Color: N/A
+# ------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -MatchMethod Match -Column Server -Value WFE -ValueForeColor White -ValueBackColor Blue;
+
+# Example CF03:
+# Column: Manufacture
+# Condition: Manufacture "HP"
+# Query: 'Manufacture' -EQ 'HP'
+# Value Fore Color: N/A
+# Value Back Color: N/A
+# Row Fore Color: White
+# Row Back Color: DarkCyan
+# ------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -MatchMethod Exact -Column "Manufacture" -Value "HP" -RowForeColor White -RowBackColor DarkCyan;
+
+# Example CF04:
+# Column: Manufacture
+# Condition: Manufacture "HP"
+# Query: 'Manufacture' -EQ 'HP'
+# Value Fore Color: Yellow
+# Value Back Color: Red
+# Row Fore Color: White
+# Row Back Color: Blue
+# ------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -MatchMethod Exact -Column "Manufacture" -Value "HP" -ValueForeColor Yellow -ValueBackColor Red -RowForeColor White -RowBackColor Blue;
+
+# Example CF05:
+# Column 01: Manufacture
+# Condition 01: Manufacture "HP"
+# Query 01: 'Manufacture' -EQ 'HP'
+# Value Fore Color 01: Yellow
+# Value Back Color 01: Red
+
+# Column 02: Server
+# Condition 02: Server matches "WFE"
+# Query 02: 'Server' -Match 'WFE'
+# Value Fore Color 02: White
+# Value Back Color 02: Blue
+# ------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -MatchMethod Exact, Match -Column "Manufacture", "Server"  -Value "HP", "WFE" -ValueForeColor Yellow, White -ValueBackColor Red, Blue;
+
+
+# Example CF06:
+# Column 01: Manufacture
+# Condition 01: Manufacture "HP"
+# Query 01: 'Manufacture' -EQ 'HP'
+# Value Fore Color 01: Yellow
+# Value Back Color 01: Red
+
+# Column 02: Server
+# Condition 02: Server matches "WFE"
+# Query 02: 'Server' -Match 'WFE'
+# Value Fore Color 02: White
+# Value Back Color 02: Blue
+
+# Column 03: FreeMemoryMB
+# Condition 03: Memory Usage Between 90% and 95%
+# Query 03: (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -LT 95 -And (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -GT 90
+# Value Fore Color 03: Yellow
+# Value Back Color 04: N/A
+# ------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -MatchMethod Exact, Match, Query -Column "Manufacture", "Server", "FreeMemoryMB"  -Value "HP", "WFE", "(('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -LT 95 -And (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -GT 90" -ValueForeColor Yellow, White, Yellow -ValueBackColor Red, Blue;
+
+# Example CF07:
+# Column 01: Manufacture
+# Condition 01: Manufacture "HP"
+# Query 01: 'Manufacture' -EQ 'HP'
+# Value Fore Color 01: Yellow
+# Value Back Color 01: Red
+
+# Column 02: Server
+# Condition 02: Server matches "WFE"
+# Query 02: 'Server' -Match 'WFE'
+# Value Fore Color 02: White
+# Value Back Color 02: Blue
+
+# Column 03: FreeMemoryMB
+# Condition 03: Memory Usage Between 90% and 95%
+# Query 03: (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -LT 95 -And (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -GT 90
+# Value Fore Color 03: Yellow
+# Value Back Color 03: N/A
+
+# Column 04: FreeMemoryMB
+# Condition 04: Memory Usage greeter than 95%
+# Query 04: (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -gt 95
+# Value Fore Color 04: Red
+# Value Back Color 04: N/A
+# ------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -MatchMethod Exact, Match, Query, Query -Column "Manufacture", "Server", "FreeMemoryMB", "FreeMemoryMB"  -Value "HP", "WFE", "(('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -LT 95 -And (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -GT 90", "(('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -gt 95" -ValueForeColor Yellow, White, Yellow, Red -ValueBackColor Red, Blue;
+
+# Example CF08:
+# Column: *
+# Condition: Any property with value equals to $False
+# Query: N/A
+# Value Fore Color: Red
+# Value Back Color: N/A
+# Row Fore Color: N/A
+# Row Back Color: N/A
+
+# Flag Columns: 'SN', 'Server'
+# Flag Columns Fore Color: Cyan
+# Flag Columns Back Color: N/A
+# ----------------------------------------------------------------------------
+Write-PSObject $servers -MatchMethod Exact -Column * -Value $false -ValueForeColor Red -FlagColumns "'SN', 'Server'" -FlagsForeColor Red;
+
+# Example CF09:
+# Column 01: FreeMemoryMB
+# Condition 01: Memory Usage Between 90% and 95%
+# Query 01: (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -LT 95 -And (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -GT 90
+# Value Fore Color 01: Yellow
+# Value Back Color 01: N/A
+# Flag Columns 01: 'SN', 'Server', 'MemoryMB'
+# Flag Columns Fore Color 01: Yellow
+# Flag Columns Back Color 01: N/A
+
+# Column 02: FreeMemoryMB
+# Condition 02: Memory Usage greeter than 95%
+# Query 02: (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -gt 95
+# Value Fore Color 02: Red
+# Value Back Color 02: N/A
+
+# Flag Columns 01: 'SN', 'Server', 'MemoryMB'
+# Flag Columns Fore Color 01: Red
+# Flag Columns Back Color 01: N/A
+# ------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -MatchMethod Query, Query -Column "FreeMemoryMB", "FreeMemoryMB"  -Value "(('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -LT 95 -And (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -GT 90", "(('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -gt 95" -ValueForeColor Yellow, Red -FlagColumns "'SN', 'Server', 'MemoryMB'", "'SN', 'Server', 'MemoryMB'" -FlagsForeColor Yellow, Red;
+
+# Example CF10:
+# Column 01: FreeMemoryMB
+# Condition 01: Memory Usage Between 90% and 95%
+# Query 01: (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -LT 95 -And (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -GT 90
+# Value Fore Color 01: Yellow
+# Value Back Color 01: N/A
+# Flag Columns 01: 'SN', 'Server', 'MemoryMB'
+# Flag Columns Fore Color 01: Yellow
+# Flag Columns Back Color 01: N/A
+
+# Column 02: FreeMemoryMB
+# Condition 02: Memory Usage greeter than 95%
+# Query 02: (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -gt 95
+# Value Fore Color 02: Red
+# Value Back Color 02: N/A
+
+# Flag Columns 02: 'SN', 'Server', 'MemoryMB'
+# Flag Columns Fore Color 02: Red
+# Flag Columns Back Color 02: N/A
+
+# Column 03: Virtualization
+# Condition 03: N/A
+# Query 03: N/A
+# Value Fore Color 03: Green
+# Value Back Color 03: N/A
+
+# Column 04: HyperVSupport
+# Condition 04: N/A
+# Query 04: N/A
+# Value Fore Color 04: Magenta
+# Value Back Color 04: N/A
+# ------------------------------------------------------------------------------------------------------
+Write-PSObject $servers -MatchMethod Query, Query -Column "FreeMemoryMB", "FreeMemoryMB"  -Value "(('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -LT 95 -And (('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -GT 90", "(('MemoryMB' - 'FreeMemoryMB') / 'MemoryMB') * 100 -gt 95" -ValueForeColor Yellow, Red -FlagColumns "'SN', 'Server', 'MemoryMB'", "'SN', 'Server', 'MemoryMB'" -FlagsForeColor Yellow, Red -ColoredColumns Virtualization, HyperVSupport -ColumnForeColor Green, Magenta;
