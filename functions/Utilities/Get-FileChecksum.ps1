@@ -6,7 +6,7 @@
         [ValidateScript( { Test-Path -path $_ -PathType Leaf })]
         [string]$Path
         ,
-        [ValidateSet('sha1', 'md5', 'sha512')]
+        [ValidateSet('sha1', 'md5', 'sha512','sha256')]
         [string]$Algorithm
     )
     $FileObject = Get-Item -Path $Path
