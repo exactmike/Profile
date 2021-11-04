@@ -1,6 +1,5 @@
 ﻿Function Compare-ComplexObject
 {
-
     [cmdletbinding()]
     param(
         [Parameter(Mandatory)]
