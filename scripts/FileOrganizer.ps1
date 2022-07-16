@@ -58,6 +58,8 @@ function Optimize-Directory
         [string[]]$dateProperty
         ,
         [switch]$DeleteSourceDirectory
+        ,
+        [switch]$RecurseSourceDirectory
         <#         ,
         [switch]$outputItems
         #>
@@ -67,7 +69,14 @@ function Optimize-Directory
     Write-Verbose -Message "Source Directory Path: $SourceDirectoryPath"
     Write-Verbose -Message "Target Directory Path: $TargetDirectoryPath"
 
-    $items = Get-ChildItem -Path $SourceDirectoryPath -Recurse -File
+    $gciParams = @{
+        Path    = $SourceDirectoryPath
+        File    = $true
+        Recurse = $RecurseSourceDirectory
+    }
+
+    $items = Get-ChildItem @gciParams
+
     switch ($dateProperty)
     {
         'dateTaken'
