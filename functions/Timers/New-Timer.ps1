@@ -187,7 +187,8 @@
                 {
                     if ($Frequency -lt 4)
                     {
-                        Out-Speech -InputObject "$secondsremaining" @outSpeechParams -ConfigurationName 'FastTimer'
+                        $outSpeechParams.ConfigurationName = 'FastTimer'
+                        Out-Speech -InputObject "$secondsremaining" @outSpeechParams
                     }
                     else
                     {
