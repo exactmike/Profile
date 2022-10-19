@@ -11,7 +11,7 @@ function Get-FunctionInfo
         FunctionInfo does not present a public constructor. This function calls an internal / private constructor on FunctionInfo to create a description of a function from a script block or file containing one or more functions.
     .PARAMETER IncludeNested
         By default functions nested inside other functions are ignored. Setting this parameter will allow nested functions to be discovered.
-    .PARAMETER Path
+    .PARAMETER FilePath
         The path to a file containing one or more functions.
     .PARAMETER ScriptBlock
         A script block containing one or more functions.
@@ -38,7 +38,7 @@ function Get-FunctionInfo
     param (
         [Parameter(Position = 1, ValueFromPipelineByPropertyName = $true, ParameterSetName = 'FromPath')]
         [Alias('FullName')]
-        [String]$Path,
+        [String]$FilePath,
 
         [Parameter(ParameterSetName = 'FromScriptBlock')]
         [ScriptBlock]$ScriptBlock,
@@ -64,7 +64,7 @@ function Get-FunctionInfo
         {
             try
             {
-                $scriptBlock = [ScriptBlock]::Create((Get-Content $Path -Raw))
+                $scriptBlock = [ScriptBlock]::Create((Get-Content $FilePath -Raw))
             }
             catch
             {
@@ -99,6 +99,6 @@ function Get-FunctionInfo
                     $constructor.Invoke(([String]$_.Name, $internalScriptBlock, $null))
                 }
             }
+        }
     }
-}
 }

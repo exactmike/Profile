@@ -20,6 +20,7 @@
     {
         foreach ($f in $FilePath)
         {
+            Write-Verbose -Message "Processing path $f"
             $GetContentParams = @{
                 Path = $f
                 Raw  = $true
@@ -28,7 +29,7 @@
             {$GetContentParams.Encoding = $Encoding}
             try
             {
-                $Content = Get-Content @GetContentParams
+                $content = Get-Content @GetContentParams
             }
             catch
             {
@@ -36,11 +37,11 @@
             }
             if ($null -eq $content -or $content.Length -lt 1)
             {
-                throw("No content found in file $Path")
+                throw("No content found in file $f")
             }
             else
             {
-                ConvertFrom-Json -InputObject $Content
+                ConvertFrom-Json -InputObject $content
             }
         }
     }
