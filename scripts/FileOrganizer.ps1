@@ -75,19 +75,23 @@ function Optimize-Directory
         Recurse = $RecurseSourceDirectory
     }
 
-    $items = Get-ChildItem @gciParams
+    $items = @(Get-ChildItem @gciParams)
 
     switch ($dateProperty)
     {
-        'dateTaken'
+        'dateTaken' # Get the dateTaken value and add it to the object as a new attribute
         {
             $items = @(Add-MediaFileDateTaken -FilePath $items.FullName)
-            $ItemsWithDateTaken = @($items.where({$null -ne $_.DateTaken}))
+            $ItemsToProcess = @($items.where({$null -ne $_.DateTaken}))
             $ItemsWithNullDateTaken = @($items.where({$null -eq $_.DateTaken}))
             if ($ItemsWithDateTaken.count -lt $items.count)
             {
                 Write-Warning -Message "Out of $($items.count) total items, $($ItemsWithNullDateTaken.count) do not have a valid DateTaken value and will not be processed."
             }
+        }
+        'LastWriteTime'
+        {
+            $ItemsToProcess = $items
         }
     }
 
@@ -95,14 +99,30 @@ function Optimize-Directory
     {
         'YearMonth'
         {
-            $years = @($ItemsWithDateTaken | Group-Object -Property @{e = {if ($null -eq $_.DateTaken) {$_.LastWriteTime.Year} else {$_.DateTaken.Year}}})
-
-            $YearMonthGroups = @{}
-            foreach ($y in $years)
+            switch ($dateProperty)
             {
-                $YearMonthGroups.$($y.Name)=@(
-                    $y.Group | Group-Object -Property @{e = {if ($null -eq $_.DateTaken) {$_.LastWriteTime.Month.tostring('00')} else {$_.DateTaken.Month.tostring('00')}}} -NoElement | Select-Object -ExpandProperty Name
-                )
+                'dateTaken'
+                {
+                    $years = @($ItemsToProcess | Group-Object -Property @{e = {if ($null -eq $_.DateTaken) {$_.LastWriteTime.Year} else {$_.DateTaken.Year}}})
+                    $YearMonthGroups = @{}
+                    foreach ($y in $years)
+                    {
+                        $YearMonthGroups.$($y.Name)=@(
+                            $y.Group | Group-Object -Property @{e = {if ($null -eq $_.DateTaken) {$_.LastWriteTime.Month.tostring('00')} else {$_.DateTaken.Month.tostring('00')}}} -NoElement | Select-Object -ExpandProperty Name
+                        )
+                    }
+                }
+                'LastWriteTime'
+                {
+                    $years = @($ItemsToProcess | Group-Object -Property @{e = {$_.LastWriteTime.Year}})
+                    $YearMonthGroups = @{}
+                    foreach ($y in $years)
+                    {
+                        $YearMonthGroups.$($y.Name)=@(
+                            $y.Group | Group-Object -Property @{e = {$_.LastWriteTime.Month.tostring('00')}} -NoElement | Select-Object -ExpandProperty Name
+                        )
+                    }
+                }
             }
 
             $PathsRequired = foreach ($key in $YearMonthGroups.Keys)
@@ -137,13 +157,32 @@ function Optimize-Directory
             # Prepare to Move Items to Directories
 
             $itemsToMove = @(
-                foreach ($i in $ItemsWithDateTaken)
+                foreach ($i in $ItemsToProcess)
                 {
-                    $newName = $i.DateTaken.ToString('yyyyMMddmmss') + '-' + $i.Name
-                    $TargetItemPath = Join-Path $TargetDirectoryPath -ChildPath $($i.DateTaken.Year) -AdditionalChildPath $($i.DateTaken.Month.ToString('00')),$($newName)
+                    switch ($dateProperty)
+                    {
+                        'dateTaken'
+                        {
+                            $newName = $i.DateTaken.ToString('yyyyMMddmmss') + '-' + $i.Name
+                            $TargetItemPath = Join-Path $TargetDirectoryPath -ChildPath $($i.DateTaken.Year) -AdditionalChildPath $($i.DateTaken.Month.ToString('00')),$($newName)
+                        }
+                        'LastWriteTime'
+                        {
+                            $newName = $i.LastWriteTime.ToString('yyyyMMddmmss') + '-' + $i.Name
+                            $TargetItemPath = Join-Path $TargetDirectoryPath -ChildPath $($i.LastWriteTime.Year) -AdditionalChildPath $($i.LastWriteTime.Month.ToString('00')),$($newName)
+                        }
+                    }
+
                     $i | Add-Member -MemberType NoteProperty -Name TargetItemPath -Value $TargetItemPath -PassThru
                 }
             )
+
+            if ($itemsToMove.count -ge 1)
+            {
+                Write-Information -MessageData "Count of Items to Move:  $($itemsToMove.Count)"
+                Write-Information -MessageData $($ItemsToMove.TargetItemPath -join ' | ')
+            }
+            else {Write-Information -MessageData "There are 0 Items to Move"}
 
 
             # Move Items to Directories
