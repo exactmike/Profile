@@ -31,7 +31,7 @@ Function Group-Join
 
     end
     {
-        $GroupedCollection = @($collection | Group-Object -Property $Property)
+        $GroupedCollection = @($collection | Select-Object -Property * | Group-Object -Property $Property)
         $GroupedCollection.foreach({
                 $group = $_
                 switch ($group.count)
@@ -42,7 +42,7 @@ Function Group-Join
                     {
                         $JPHash = @{}
                         $JoinProperty.foreach({
-                                $JPHash.$_ = $group.group.$_ -join $JoinDelimeter
+                                $JPHash.$_ = @($group.group.$_ | Sort-Object -Unique) -join $JoinDelimeter
                             })
                         $JPHash.Keys.foreach({
                                 $group.group[0].$_ = $JPHash.$_
