@@ -1,0 +1,135 @@
+{
+    "Movements": [
+        {
+            "Name": "Shred Lift",
+            "Steps": [
+                {
+                    "Name": "Hinge Deeply",
+                    "Description": "Rock your butt backward and fold your torso level. Your shoulders should drop to the same level as your hips. The handlebars will rotate forward and down. This is the position you'll use when you're riding down anything steep.",
+                    "Order": 1,
+                    "Type": "Repeated Motion"
+                },
+                {
+                    "Name": "Hip/Hand Drive",
+                    "Description": "Drive your hips and hands toward each other. Keep your torso engaged. Fire your glutes. Boom! Your should end up standing perfectly upright. This is the position you'll use then you're riding up anything steep.",
+                    "Order": 2,
+                    "Type": "Repeated Motion"
+                }
+            ]
+        },
+        {
+            "Name": "Low Row",
+            "Steps": [
+                {
+                    "Name": "Hinge Deeply",
+                    "Description": "Rock your butt backward and fold your torso level. Your shoulders should drop to the same level as your hips. The handlebars will rotate forward and down. This is the position you'll use when you're riding down anything steep.",
+                    "Order": 1,
+                    "Type": "Starting Position"
+                },
+                {
+                    "Name": "Arm Pull/Push",
+                    "Description": "Pull and Push your arms using lats and chest muscles and stabilizing your core in the deep hinge position during the movement.",
+                    "Order": 2,
+                    "Type": "Repeated Motion"
+                }
+            ]
+        },
+        {
+            "Name": "Straight Row",
+            "Steps": [
+                {
+                    "Name": "Low Hinge",
+                    "Description": "Rock your butt backward and fold your torso level. Your shoulders should drop to the same level as your hips. The handlebars will rotate forward and down. This is the position you'll use when you're riding down anything steep.",
+                    "Order": 1,
+                    "Type": "starting Position"
+                },
+                {
+                    "Name": "High Hinge Pull",
+                    "Description": "From Low Hinge move to High Hinge while pulling with lats, posterior deltoids, biceps ",
+                    "Order": 2,
+                    "Type": "Repeated Motion"
+                },
+                {
+                    "Name": "Low Hinge Push",
+                    "Description": "From High Hing move to Low Hinge while pushing with chest, anterior deltoids, triceps",
+                    "Order": 3,
+                    "Type": "Repeated Motion"
+                }
+            ]
+        },
+        {
+            "Name": "Round Row",
+            "Steps": [
+                {
+                    "Name": "Hinge Deeply",
+                    "Description": "Rock your butt backward and fold your torso level. Your shoulders should drop to the same level as your hips. The handlebars will rotate forward and down. This is the position you'll use when you're riding down anything steep.",
+                    "Order": 1,
+                    "Type": "Repeated Motion"
+                },
+                {
+                    "Name": "Hip Drive/High Hinge Pull",
+                    "Description": "Drive your hips and hands toward each other. Keep your torso engaged. Fire your glutes. Before reaching full standing extension begin then next Low Hinge Push then into Arm Push",
+                    "Order": 2,
+                    "Type": "Repeated Motion"
+                },
+                {
+                    "Name": "Low Hinge Push/Arm Push",
+                    "Description": "Pull and Push your arms using lats and chest muscles and stabilizing your core in the deep hinge position during the movement. Before reaching full arm extension Begin the next Hip Drive then back into High Hinge Pull",
+                    "Order": 2,
+                    "Type": "Repeated Motion"
+                }
+            ]
+        },
+        {
+            "Name": "Cornering Right",
+            "Steps": [
+                {
+                    "Name": "Anti-Row to the Right",
+                    "Description": "Starting from Right Foot Forward High Hinge, Anti-Row rotating hips to the left and behind the Rip Row seat",
+                    "Order": 1,
+                    "Type": "Repeated Motion"
+                },
+                {
+                    "Name": "Row and Center Hips back to High Hinge",
+                    "Description": "Row back to High Hinge and Rotate Hips back to centered over bottom bracket",
+                    "Order": 2,
+                    "Type": "Repeated Motion"
+                }
+            ]
+        },
+        {
+            "Name": "Cornering Left",
+            "Steps": [
+                {
+                    "Name": "Anti-Row to the Left",
+                    "Description": "Starting from Left Foot Forward High Hinge, Anti-Row rotating hips to the right and behind the Rip Row seat",
+                    "Order": 1,
+                    "Type": "Repeated Motion"
+                },
+                {
+                    "Name": "Row and Center Hips back to High Hinge",
+                    "Description": "Row back to High Hinge and Rotate Hips back to centered over bottom bracket",
+                    "Order": 2,
+                    "Type": "Repeated Motion"
+                }
+            ]
+        },
+        {
+            "Name": "Slalom",
+            "Steps": [
+                {
+                    "Name": "Anti-Row to the Left",
+                    "Description": "Starting from Left Foot Forward High Hinge, Anti-Row rotating hips to the right and behind the Rip Row seat",
+                    "Order": 1,
+                    "Type": "Repeated Motion"
+                },
+                {
+                    "Name": "Row and Center Hips back to High Hinge",
+                    "Description": "Row back to High Hinge and Rotate Hips back to centered over bottom bracket",
+                    "Order": 2,
+                    "Type": "Repeated Motion"
+                }
+            ]
+        }
+    ]
+}

@@ -1,45 +1,4 @@
-function Add-MediaFileDateTaken
-{
-    [cmdletbinding()]
-    param(
-        [ValidateScript({Test-Path -Path $_ -PathType Leaf})]
-        [string[]]$FilePath
-    )
-    begin
-    {
-        $ShellExp = New-Object -ComObject Shell.Application
-    }
-    process
-    {
-        foreach ($i in $FilePath)
-        {
-            $item = Get-Item -Path $i
-            $itemdirectory = $ShellExp.NameSpace($item.DirectoryName)
-            $itemfile = $itemdirectory.ParseName($item.name)
-            $datetaken = $null
-            switch ($item.Extension)
-            {
-                '.mov'
-                {
-                    $datetakenstring = ($itemdirectory.GetDetailsOf($itemfile, 208) -replace "`u{200e}") -replace "`u{200f}"
-                }
-                '.avi'
-                {
-                    $datetakenstring = ($itemdirectory.GetDetailsOf($itemfile, 208) -replace "`u{200e}") -replace "`u{200f}"
-                }
-                '.jpg'
-                {
-                    $datetakenstring = ($itemdirectory.GetDetailsOf($itemfile, 12) -replace "`u{200e}") -replace "`u{200f}"
-                }
-            }
 
-            if (-not [string]::IsNullOrEmpty($datetakenstring))
-            {$dateTaken = $datetakenstring | Get-Date}
-            Add-Member -InputObject $item -MemberType NoteProperty -Name DateTaken -Value $Datetaken -TypeName datetime -PassThru
-        }
-    }
-
-}
 function Optimize-Directory
 {
     [cmdletbinding(SupportsShouldProcess)]
@@ -81,7 +40,7 @@ function Optimize-Directory
     {
         'dateTaken'
         {
-            $items = @(Add-MediaFileDateTaken -FilePath $items.FullName)
+            $items = @(Add-MediaFileDateTakenAttribute -FilePath $items.FullName)
             $ItemsWithDateTaken = @($items.where({$null -ne $_.DateTaken}))
             $ItemsWithNullDateTaken = @($items.where({$null -eq $_.DateTaken}))
             if ($ItemsWithDateTaken.count -lt $items.count)
