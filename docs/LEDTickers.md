@@ -21,6 +21,7 @@ The LED Ticker is made up of a grid of LEDs (64x by 32y) with zero-based coordin
 ## Understanding Text Elements
 
 ### Sizes
+
 Valid size values range from 1 to 4 with 1 being the smallest available text size and 4 being the largest available text size. The sizes have the following characteristics:
 
 - Size 1
