@@ -9,7 +9,7 @@ function New-LEDTextElement {
         ,
         [parameter()]
         [AllowNull()]
-        [ValidateRange(1, 4)]
+        [ValidateSet(1,2,3,4)]
         [int]$size # the text size from 1 (smallest) to 4 (largest)
         ,
         [parameter()]
