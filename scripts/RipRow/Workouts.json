@@ -1,0 +1,239 @@
+{
+    "Workouts": [
+        {
+            "Name": "Workout A",
+            "Steps": [
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                }
+            ]
+        },
+        {
+            "Name": "Workout B",
+            "Steps": [
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Straight Row",
+                    "Duration": 120,
+                    "DurationUnits": "Seconds"
+                }
+            ]
+        },
+        {
+            "Name": "Workout C",
+            "Steps": [
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Straight Row",
+                    "Duration": 240,
+                    "DurationUnits": "Seconds"
+                }
+            ]
+        },
+        {
+            "Name": "Workout D",
+            "Steps": [
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Straight Row",
+                    "Duration": 180,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Round Row",
+                    "Duration": 180,
+                    "DurationUnits": "Seconds"
+                }
+            ]
+        },
+        {
+            "Name": "Workout E",
+            "Steps": [
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Round Row",
+                    "Duration": 120,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Cornering Right",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Cornering Left",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Cornering Right",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Cornering Left",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                }
+            ]
+        },
+        {
+            "Name": "Workout F",
+            "Steps": [
+                {
+                    "Name": "Shred Lift",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Low Row",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Round Row",
+                    "Duration": 120,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Cornering Right",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Cornering Left",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Cornering Right",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Cornering Left",
+                    "Duration": 60,
+                    "DurationUnits": "Seconds"
+                },
+                {
+                    "Name": "Slalom",
+                    "Duration": 120,
+                    "DurationUnits": "Seconds"
+                }
+            ]
+        }
+    ]
+}
