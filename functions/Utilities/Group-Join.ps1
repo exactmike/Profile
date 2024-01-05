@@ -40,7 +40,7 @@ Function Group-Join
                     {$group.group}
                     {$_ -ge 2}
                     {
-                        $JPHash = @{}
+                        $JPHash = [ordered]@{}
                         $JoinProperty.foreach({
                                 $JPHash.$_ = @($group.group.$_ | Sort-Object -Unique) -join $JoinDelimeter
                             })
