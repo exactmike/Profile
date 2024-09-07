@@ -5,7 +5,7 @@
     param(
         [parameter(Mandatory = $true, valuefrompipeline = $true, valuefrompipelinebypropertyname = $true, ParameterSetName = 'Default')]
         [parameter(ParameterSetName = 'FirstLast')]
-        [string]$Identity
+        [string[]]$Identity
         ,
         [parameter(Mandatory = $true)]
         [validateset('SAMAccountName', 'UserPrincipalName', 'ProxyAddress', 'Mail', 'mailNickname', 'employeeNumber', 'employeeID', 'extensionattribute5', 'extensionattribute11', 'extensionattribute13', 'DistinguishedName', 'CanonicalName', 'ObjectGUID', 'mS-DS-ConsistencyGuid', 'SID', 'GivenNameSurname')]
@@ -13,7 +13,7 @@
         ,
         [switch]$DoNotPreserveLocation #use this switch when you are already running the commands from the correct AD Drive
         ,
-        $properties = $ADUserAttributes
+        [string[]]$properties
         ,
         [parameter(ParameterSetName = 'FirstLast', Mandatory = $true)]
         [string]$GivenName
@@ -24,39 +24,9 @@
         [switch]$AmbiguousAllowed
         ,
         [switch]$ReportExceptions
-    )#param
-    <#     DynamicParam
-    {
-        $NewDynamicParameterParams = @{
-            Name        = 'ADInstance'
-            ValidateSet = @($Script:CurrentOrgAdminProfileSystems | Where-Object SystemType -like 'ActiveDirectory*').name
-
-            Position    = 2
-        }
-        $Dictionary = New-DynamicParameter @NewDynamicParameterParams -Type []
-        Write-Output -InputObject $Dictionary
-    }#DynamicParam #>
-    Begin
-    {
-        #Dynamic Parameter to Variable Binding
-        #Set-DynamicParameterVariable -dictionary $Dictionary
-        $ADInstance = $ActiveDirectoryInstance
-        if ($DoNotPreserveLocation -ne $true) { Push-Location -StackName 'Lookup-ADUser' }
-        #validate AD Instance
-        try
-        {
-            #Write-Log -Message "Attempting: Set Location to AD Drive $("$ADInstance`:")"
-            Set-Location -Path $("$ADInstance`:\") -ErrorAction Stop
-            #Write-Log -Message "Succeeded: Set Location to AD Drive $("$ADInstance`:")"
-        }#try
-        catch
-        {
-            Write-Log -Message "Failed: Set Location to AD Drive $("$ADInstance`:")" -Verbose -ErrorLog
-            Write-Log -Message $_.tostring() -ErrorLog
-            $ErrorRecord = New-ErrorRecord -Exception 'System.Exception' -ErrorId ADDriveNotAvailable -ErrorCategory NotSpecified -TargetObject $ADInstance -Message 'Required AD Drive not available'
-            $PSCmdlet.ThrowTerminatingError($ErrorRecord)
-        }
-        #Setup GetADUserParams
+    )
+    Begin {
+    #Setup GetADUserParams
         $GetADUserParams = @{ErrorAction = 'Stop' }
         if ($properties.count -ge 1)
         {
@@ -164,31 +134,30 @@
             }#try
             catch
             {
-                Write-Log -Message "FAILED: Get-ADUser with identifier $ID for Attribute $IdentityType" -Verbose -ErrorLog
-                Write-Log -Message $_.tostring() -ErrorLog
-                if ($ReportExceptions) { $Script:LookupADUserNotFound += $ID }
+                Write-Information -Message "FAILED: Get-ADUser with identifier $ID for Attribute $IdentityType" -InformationAction Continue
+                if ($ReportExceptions) { $Global:Find_ADUser_NotFound += $ID }
             }
             switch ($aduser.Count)
             {
                 1
                 {
                     $TrimmedADUser = $ADUser | Select-Object -property * -ExcludeProperty Item, PropertyNames, *Properties, PropertyCount
-                    Write-Output -InputObject $TrimmedADUser
+                    $TrimmedADUser
                 }#1
                 0
                 {
-                    if ($ReportExceptions) { $Script:LookupADUserNotFound += $ID }
+                    if ($ReportExceptions) { $Global:Find_ADUser_NotFound += $ID }
                 }#0
                 Default
                 {
                     if ($AmbiguousAllowed)
                     {
                         $TrimmedADUser = $ADUser | Select-Object -property * -ExcludeProperty Item, PropertyNames, *Properties, PropertyCount
-                        Write-Output -InputObject $TrimmedADUser
+                        $TrimmedADUser
                     }
                     else
                     {
-                        if ($ReportExceptions) { $Script:LookupADUserAmbiguous += $ID }
+                        if ($ReportExceptions) { $Global:Find_ADUser_Ambiguous += $ID }
                     }
                 }#Default
             }#switch
@@ -200,16 +169,15 @@
         {
             if ($Script:LookupADUserNotFound.count -ge 1)
             {
-                Write-Log -Message 'Review logs or OneShell variable $LookupADUserNotFound for exceptions' -Verbose -ErrorLog
-                Write-Log -Message "$($Script:LookupADUserNotFound -join "`n`t")" -ErrorLog
+                Write-Information -Message 'Review variable Find_ADUser_NotFound for exceptions' -InformationAction Continue
+                Write-Information -Message "$($Global:Find_ADUser_NotFound -join "`n`t")" -InformationAction Continue
             }#if
             if ($Script:LookupADUserAmbiguous.count -ge 1)
             {
-                Write-Log -Message 'Review logs or OneShell variable $LookupADUserAmbiguous for exceptions' -Verbose -ErrorLog
-                Write-Log -Message "$($Script:LookupADUserAmbiguous -join "`n`t")" -ErrorLog
+                Write-Information -Message 'Review variable Find-ADUser-Ambiguous for exceptions' -Verbose -ErrorLog
+                Write-Information -Message "$($Global:Find_ADUser_Ambiguous -join "`n`t")" -ErrorLog
             }#if
         }#if
-        if ($DoNotPreserveLocation -ne $true) { Pop-Location -StackName 'Lookup-ADUser' }#if
     }#end
 
 }
