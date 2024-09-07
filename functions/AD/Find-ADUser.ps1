@@ -11,8 +11,6 @@
         [validateset('SAMAccountName', 'UserPrincipalName', 'ProxyAddress', 'Mail', 'mailNickname', 'employeeNumber', 'employeeID', 'extensionattribute5', 'extensionattribute11', 'extensionattribute13', 'DistinguishedName', 'CanonicalName', 'ObjectGUID', 'mS-DS-ConsistencyGuid', 'SID', 'GivenNameSurname')]
         $IdentityType
         ,
-        [switch]$DoNotPreserveLocation #use this switch when you are already running the commands from the correct AD Drive
-        ,
         [string[]]$properties
         ,
         [parameter(ParameterSetName = 'FirstLast', Mandatory = $true)]
@@ -24,6 +22,8 @@
         [switch]$AmbiguousAllowed
         ,
         [switch]$ReportExceptions
+        ,
+        [string]$Server
     )
     Begin {
     #Setup GetADUserParams
@@ -32,6 +32,10 @@
         {
             #Write-Log -Message "Using Property List: $($properties -join ",") with Get-ADUser"
             $GetADUserParams.Properties = $Properties
+        }
+        if (-not [string]::IsNullOrEmpty($Server))
+        {
+            $GetADUserParams.Server = $Server
         }
         #Setup exception reporting
         if ($ReportExceptions)
