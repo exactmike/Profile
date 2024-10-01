@@ -147,12 +147,30 @@ function Get-TimeInZone {
         )]
         [string[]]$TimeZoneID
         ,
-        [DateTime]$Time
+        [DateTime]$DateTime
     )
 
     foreach ($tz in $TimeZoneID)
     {
-        Get-Date $([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($Time,$tz))
+        $zone = Get-TimeZone -Id $tz
+        $ZoneDateTime = Get-Date $([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($DateTime,$tz))
+        switch ($zone.IsDaylightSavingTime($ZoneDateTime))
+        {
+            $true
+            {
+                [PSCustomObject]@{
+                    DateTime = Get-Date -Date $([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($DateTime,$tz))
+                    ZoneName = $zone.DaylightName
+                }
+            }
+            $false
+            {
+                [PSCustomObject]@{
+                    DateTime = Get-Date -Date $([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId($DateTime,$tz))
+                    ZoneName = $zone.StandardName
+                }
+            }
+        }
     }
 
 }
