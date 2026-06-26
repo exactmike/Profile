@@ -26,13 +26,13 @@ function Add-MediaFileDateTakenAttribute
     {
         foreach ($i in $FilePath)
         {
-            Write-Information -MessageData "Processing item $i"
+            #Write-Information -MessageData "Processing item $i"
             $item = Get-Item -Path $i
-            Write-Information -MessageData "Processing item directory $($item.DirectoryName)"
+            #Write-Information -MessageData "Processing item directory $($item.DirectoryName)"
             $itemdirectory = $ShellExp.NameSpace($item.DirectoryName)
             $itemfile = $itemdirectory.ParseName($item.name)
             $datetaken = $null
-            Write-Information -MessageData "Processing item extention type $($item.Extension)"
+            #Write-Information -MessageData "Processing item extention type $($item.Extension)"
             switch ($item.Extension)
             {
                 '.mov'
@@ -51,11 +51,11 @@ function Add-MediaFileDateTakenAttribute
 
             if (-not [string]::IsNullOrEmpty($datetakenstring))
             {
-                Write-Information -MessageData "Date Taken Value Identified: $datetakenstring"
+                #Write-Information -MessageData "Date Taken Value Identified: $datetakenstring"
                 $dateTaken = $datetakenstring | Get-Date
             }
-            Write-Information -MessageData "Adding DateTaken Attribute with value: $dateTaken"
-            Add-Member -InputObject $item -NotePropertyName DateTaken -NotePropertyValue $Datetaken -PassThru
+            #Write-Information -MessageData "Adding DateTaken Attribute with value: $dateTaken"
+            Add-Member -InputObject $item -NotePropertyName DateTaken -NotePropertyValue $dateTaken -PassThru
         }
     }
 }
