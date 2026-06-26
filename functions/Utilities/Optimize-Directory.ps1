@@ -16,7 +16,7 @@ function Optimize-Directory {
         ,
         [Parameter(Mandatory)]
         [ValidateSet('dateTaken', 'LastWriteTime')]
-        [String[]]$DateProperty
+        [String]$DateProperty
         ,
         [switch]$DeleteSourceDirectory
         ,
@@ -45,7 +45,7 @@ function Optimize-Directory {
             $itemsWithDateTaken = @($items.where({ $null -ne $_.DateTaken }))
             $itemsWithNullDateTaken = @($items.where({ $null -eq $_.DateTaken }))
             if ($ItemsWithDateTaken.count -lt $items.count) {
-                $message = "Skipping $($itemsWithNullDateTaken.count) out of $($items.count).  These do not have a null DateTaken attribute."
+                $message = "Skipping $($itemsWithNullDateTaken.count) out of $($items.count).  These have a null DateTaken attribute."
                 Write-Information -Message $message
             }
         }
@@ -53,7 +53,19 @@ function Optimize-Directory {
 
     switch ($Optimization) {
         'YearMonth' {
-            $years = @($itemsWithDateTaken |
+
+            $itemsToProcessForOptimization = @(
+                switch ($DateProperty) {
+                    'dateTaken' {
+                        $itemsWithDateTaken
+                    }
+                    'LastWriteTime' {
+                        $items
+                    }
+                }
+            )
+
+            $years = @($itemsToProcessForOptimization |
                     Group-Object -Property @{e = { if ($null -eq $_.DateTaken) { $_.LastWriteTime.Year } else { $_.DateTaken.Year } } })
 
             $yearMonthGroups = @{}
@@ -82,6 +94,7 @@ function Optimize-Directory {
             # Create Directories in Target
 
             $currentTargetDirectories = Get-ChildItem -Path $TargetDirectoryPath -Directory -Recurse | Group-Object -AsHashTable -Property FullName -AsString
+            if ($null -eq $currentTargetDirectories) { $currentTargetDirectories = @{} }
             $pathsNotExisting = @($pathsRequired.where({ -not $currentTargetDirectories.ContainsKey($_) }))
 
             Write-Information -MessageData "Count of Paths Required But Not Existing: $($pathsNotExisting.count)"
@@ -97,18 +110,16 @@ function Optimize-Directory {
 
                 }
             }
-
-            # Prepare to Move Items to Directories
-
-            $itemsToMove = @(
-                foreach ($i in $ItemsWithDateTaken) {
-                    $newName = $i.DateTaken.ToString('yyyyMMddmmss') + '-' + $i.Name
-                    $targetItemPath = Join-Path $TargetDirectoryPath -ChildPath $($i.DateTaken.Year) -AdditionalChildPath $($i.DateTaken.Month.ToString('00')), $($newName)
-                    $i | Add-Member -MemberType NoteProperty -Name TargetItemPath -Value $TargetItemPath -PassThru
-                }
-            )
         }
     }
+
+
+    $itemsToMove = @(
+        foreach ($i in $itemsToProcessForOptimization) {
+            $newName = $i.$($DateProperty).ToString('yyyyMMddmmss') + '-' + $i.Name
+            $targetItemPath = Join-Path $TargetDirectoryPath -ChildPath $($i.$($DateProperty).Year) -AdditionalChildPath $($i.$($DateProperty).Month.ToString('00')), $($newName)
+            $i | Add-Member -MemberType NoteProperty -Name TargetItemPath -Value $TargetItemPath -PassThru
+        })
 
     # Move Items to Directories
     $moveErrorsDetected = $false
