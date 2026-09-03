@@ -48,7 +48,7 @@ function Export-Json {
         [Alias('PSPath', 'FullName')]
         [string]$FilePath
         ,
-        [System.Text.Encoding]$Encoding
+        [string]$Encoding
         ,
         [Parameter(ValueFromPipeline)]
         [psobject]$InputObject

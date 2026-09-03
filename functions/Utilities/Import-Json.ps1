@@ -44,7 +44,7 @@ function Import-Json {
         [ValidateScript({ Test-Path -Path $_ })]
         [string[]]$FilePath
         ,
-        [System.Text.Encoding]$Encoding
+        [string]$Encoding
         ,
         [switch]$AsHashtable
         ,
