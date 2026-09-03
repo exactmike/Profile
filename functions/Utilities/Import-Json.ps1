@@ -11,7 +11,9 @@ function Import-Json {
     .PARAMETER FilePath
         Path(s) of the JSON file(s) to read.
     .PARAMETER Encoding
-        Character encoding to use when reading the file. Accepts the same values as Get-Content.
+        Character encoding to use when reading the file: ansi, ascii, bigendianunicode,
+        bigendianutf32, oem, unicode, utf7, utf8, utf8BOM, utf8NoBOM, or utf32 (the same values
+        Get-Content accepts).
     .PARAMETER AsHashtable
         Passed through to ConvertFrom-Json.
     .PARAMETER Depth
@@ -44,6 +46,7 @@ function Import-Json {
         [ValidateScript({ Test-Path -Path $_ })]
         [string[]]$FilePath
         ,
+        [ValidateSet('ansi', 'ascii', 'bigendianunicode', 'bigendianutf32', 'oem', 'unicode', 'utf7', 'utf8', 'utf8BOM', 'utf8NoBOM', 'utf32')]
         [string]$Encoding
         ,
         [switch]$AsHashtable

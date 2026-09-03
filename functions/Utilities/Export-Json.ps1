@@ -11,8 +11,9 @@ function Export-Json {
     .PARAMETER FilePath
         Path of the file to write the JSON output to.
     .PARAMETER Encoding
-        Character encoding to use when writing the file. Accepts the same values as Out-File
-        (e.g. utf8, utf8NoBOM, ascii, unicode). Defaults to Out-File's own default when omitted.
+        Character encoding to use when writing the file: ansi, ascii, bigendianunicode,
+        bigendianutf32, oem, unicode, utf7, utf8, utf8BOM, utf8NoBOM, or utf32 (the same values
+        Out-File accepts). Defaults to Out-File's own default when omitted.
     .PARAMETER InputObject
         Object(s) to convert to JSON. Multiple pipeline objects are collected into a single
         JSON array, matching ConvertTo-Json's own aggregation behavior.
@@ -48,6 +49,7 @@ function Export-Json {
         [Alias('PSPath', 'FullName')]
         [string]$FilePath
         ,
+        [ValidateSet('ansi', 'ascii', 'bigendianunicode', 'bigendianutf32', 'oem', 'unicode', 'utf7', 'utf8', 'utf8BOM', 'utf8NoBOM', 'utf32')]
         [string]$Encoding
         ,
         [Parameter(ValueFromPipeline)]
