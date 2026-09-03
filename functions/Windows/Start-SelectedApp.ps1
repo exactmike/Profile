@@ -9,7 +9,7 @@ function Start-SelectedApp
         ,
         # Name of the Group of Apps to Start
         [Parameter(Mandatory,ParameterSetName='Group')]
-        [ValidateSet('DailyCrypto')]
+        [ValidateSet('AGroup')]
         [String]
         $Group
     )
@@ -32,19 +32,9 @@ function Start-SelectedApp
                 {
                     switch ($Group)
                     {
-                        'DailyCrypto'
+                        'AGroup'
                         {
-                            'MetaMask'
-                            'AAVE'
-                            'Adamant'
-                            'Balancer'
-                            'Mai Finance'
-                            'Impermax'
-                            'Cometh'
-                            'QuickSwap'
-                            'ParaSwap'
-                            'Mantra DAO'
-                            'Polygon Beefy'
+
                         }
                     }
                 }
