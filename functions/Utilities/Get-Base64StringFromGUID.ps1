@@ -1,4 +1,4 @@
-﻿    Function Get-ImmutableIDFromGUID {
+﻿    Function Get-Base64StringFromGUID {
         
     [cmdletbinding()]
     param

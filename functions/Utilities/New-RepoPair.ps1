@@ -1,10 +1,10 @@
 #requires -Version 7.0
 
-function New-ClaudeRepoPairing {
+function New-RepoPair {
     <#
     .SYNOPSIS
         Sets up a "local_<repo>" companion directory next to an existing git
-        repository clone, wired up for Claude Code.
+        repository clone, wired up for agentic code assistance as well as for local storage of related scripts, tools, secrets, etc.
 
     .DESCRIPTION
         Given the path to an existing cloned repository (e.g. C:\dev\InstallManager),
@@ -60,7 +60,7 @@ function New-ClaudeRepoPairing {
         [Parameter(Mandatory, Position = 0)]
         [string]$RepoPath,
 
-        [string[]]$LocalFolders = @('agent-instructions', 'sessions', 'plans', 'pull-requests', 'checklists','briefings', 'issues'),
+        [string[]]$LocalFolders = @('agent-instructions', 'sessions', 'plans', 'pull-requests', 'checklists','briefings', 'issues','artifacts', 'captures','secrets','tools'),
 
         [string]$LocalPrefix = 'local_',
 
