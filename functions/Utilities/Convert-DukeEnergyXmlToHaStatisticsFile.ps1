@@ -147,23 +147,48 @@ function Convert-DukeEnergyXmlToHaStatisticsFile
     $nsmgr.AddNamespace('espi', $ns.espi)
 
     # --- Source metadata from <espi:interval> (Duke-specific structure) ---
-    $intervalNode = (Select-Xml -Xml $xml -Namespace $ns -XPath '//espi:interval' | Select-Object -First 1).Node
-    if (-not $intervalNode)
+    # Two source layouts are supported:
+    #  - Legacy Duke (single atom:entry, before ~Nov 2026): unitOfMeasure ('kWH') and
+    #    secondsPerInterval are under //espi:interval.
+    #  - Green Button feed (atom:feed, from ~Nov 2026): //espi:ReadingType holds
+    #    uom (ESPI code, 72 = Wh), powerOfTenMultiplier, and intervalLength.
+    $uomNode = $xml.SelectSingleNode('//espi:interval/espi:unitOfMeasure', $nsmgr)
+    $spiNode = $xml.SelectSingleNode('//espi:interval/espi:secondsPerInterval', $nsmgr)
+    $readingTypeNode = $xml.SelectSingleNode('//espi:ReadingType', $nsmgr)
+    $powerOfTenMultiplier = 0
+
+    if ($uomNode -and $spiNode)
     {
-        throw 'Could not find //espi:interval in the XML. Cannot determine unitOfMeasure/secondsPerInterval.'
+        Write-Information -MessageData 'Detected legacy Duke layout (metadata under espi:interval)'
+        $unitOfMeasure = ($uomNode.InnerText).Trim()
+        [int]$secondsPerInterval = ($spiNode.InnerText).Trim()
     }
-
-    $uomNode = $intervalNode.SelectSingleNode('espi:unitOfMeasure', $nsmgr)
-    $spiNode = $intervalNode.SelectSingleNode('espi:secondsPerInterval', $nsmgr)
-
-    if (-not $uomNode -or -not $spiNode)
+    elseif ($readingTypeNode)
     {
-        throw 'Missing espi:unitOfMeasure or espi:secondsPerInterval under //espi:interval.'
-    }
+        Write-Information -MessageData 'Detected Green Button feed layout (metadata under espi:ReadingType)'
+        $uomCodeNode = $readingTypeNode.SelectSingleNode('espi:uom', $nsmgr)
+        $intervalLengthNode = $readingTypeNode.SelectSingleNode('espi:intervalLength', $nsmgr)
+        $powerOfTenNode = $readingTypeNode.SelectSingleNode('espi:powerOfTenMultiplier', $nsmgr)
+        if (-not $uomCodeNode -or -not $intervalLengthNode)
+        {
+            throw 'Missing espi:uom or espi:intervalLength under //espi:ReadingType.'
+        }
 
-    $unitOfMeasure = ($uomNode.InnerText).Trim()
-    # Normalize UnitOfMeasure to HA expected case
-    [int]$secondsPerInterval = ($spiNode.InnerText).Trim()
+        [int]$uomCode = ($uomCodeNode.InnerText).Trim()
+        [int]$secondsPerInterval = ($intervalLengthNode.InnerText).Trim()
+        if ($powerOfTenNode) { [int]$powerOfTenMultiplier = ($powerOfTenNode.InnerText).Trim() }
+
+        # ESPI UnitSymbolKind: 72 = Wh. Map other codes here if Duke starts to use them.
+        $unitOfMeasure = switch ($uomCode)
+        {
+            72 { 'Wh' }
+            default { throw "Unsupported ESPI uom code $uomCode. Expected 72 (Wh)." }
+        }
+    }
+    else
+    {
+        throw 'Could not find unit/interval metadata (//espi:interval/espi:unitOfMeasure or //espi:ReadingType).'
+    }
 
     Write-Information -MessageData "Interval metadata: unitOfMeasure='$unitOfMeasure', secondsPerInterval=$secondsPerInterval"
 
@@ -176,16 +201,19 @@ function Convert-DukeEnergyXmlToHaStatisticsFile
 
     # Normalize interval values to kWh
     # Duke uses 'kWH' (case-insensitive). We'll accept kWh and Wh variants.
+    # Output is always kWh (the case-sensitive value Home Assistant expects).
     $kwhMultiplier = 1.0
     switch -Regex ($unitOfMeasure)
     {
-        '^kwh$' { $kwhMultiplier = 1.0; $unitOfMeasure = 'kWh'; break } # kWh is the case-sensitive expected value of Home Assistant
-        '^wh$' { $kwhMultiplier = 1.0 / 1000.0; $unitOfMeasure = 'Wh'; break } # Wh is the case-sensitive expected value of Home Assistant
+        '^kwh$' { $kwhMultiplier = 1.0; break }
+        '^wh$' { $kwhMultiplier = 1.0 / 1000.0; break }
         default
         {
             throw "Unsupported unitOfMeasure='$unitOfMeasure'. Expected kWh/kWH or Wh."
         }
     }
+    $kwhMultiplier *= [math]::Pow(10, $powerOfTenMultiplier)
+    $unitOfMeasure = 'kWh'
 
     Write-Information -MessageData "Value normalization: multiplier-to-kWh = $kwhMultiplier (unitOfMeasure='$unitOfMeasure')"
 
