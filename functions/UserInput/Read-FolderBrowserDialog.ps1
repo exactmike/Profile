@@ -11,6 +11,9 @@
         ,
         [switch]$NoNewFolderButton
     )
+    if (-not $IsWindows) {
+        throw [System.PlatformNotSupportedException]::new('Read-FolderBrowserDialog requires Windows.')
+    }
     Add-Type -AssemblyName System.Windows.Forms
     $FolderBrowserDialog = New-Object System.Windows.Forms.FolderBrowserDialog
     if ($NoNewFolderButton) {$FolderBrowserDialog.ShowNewFolderButton = $false}

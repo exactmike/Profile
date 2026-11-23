@@ -76,6 +76,9 @@
         [Switch]
         $Force
     )
+    if (-not $IsWindows) {
+        throw [System.PlatformNotSupportedException]::new('Set-RemoteRegistry requires Windows.')
+    }
 
     If ($pscmdlet.ShouldProcess($ComputerName, "Open registry $Hive"))
     {

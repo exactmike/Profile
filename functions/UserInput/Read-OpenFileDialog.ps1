@@ -10,6 +10,9 @@
         ,
         [switch]$AllowMultiSelect
     )
+    if (-not $IsWindows) {
+        throw [System.PlatformNotSupportedException]::new('Read-OpenFileDialog requires Windows.')
+    }
     Add-Type -AssemblyName System.Windows.Forms
     $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
     $openFileDialog.Title = $WindowTitle

@@ -16,6 +16,9 @@
         [AllowNull()]
         [guid[]]$TenantID
     )
+    if (-not $IsWindows) {
+        throw [System.PlatformNotSupportedException]::new('Get-OneDriveAccount requires Windows.')
+    }
     if (Test-Path HKCU:\Software\Microsoft\OneDrive\Accounts -PathType Container)
     {
         @(Get-ChildItem -Path HKCU:\Software\Microsoft\OneDrive\Accounts).foreach(

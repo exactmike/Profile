@@ -5,6 +5,9 @@
         ,
         [string]$username
     )
+    if (-not $IsWindows) {
+        throw [System.PlatformNotSupportedException]::new('Export-Credential requires Windows.')
+    }
     $GetCredentialParams = @{}
     if ($message) {$GetCredentialParams.Message = $message}
     if ($username) {$GetCredentialParams.Username = $username}

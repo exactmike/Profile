@@ -20,6 +20,9 @@ function Add-MediaFileDateTakenAttribute
     )
     begin
     {
+        if (-not $IsWindows) {
+            throw [System.PlatformNotSupportedException]::new('Add-MediaFileDateTakenAttribute requires Windows.')
+        }
         $ShellExp = New-Object -ComObject Shell.Application
     }
     process

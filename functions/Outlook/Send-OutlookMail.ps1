@@ -33,6 +33,9 @@ Function Send-OutlookMail
     )
     Begin
     {
+        if (-not $IsWindows) {
+            throw [System.PlatformNotSupportedException]::new('Send-OutlookMail requires Windows.')
+        }
         try
         {
             $outlook = [Runtime.Interopservices.Marshal]::GetActiveObject('Outlook.Application')

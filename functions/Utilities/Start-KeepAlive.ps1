@@ -1,5 +1,8 @@
 function Start-KeepAlive
 {
+    if (-not $IsWindows) {
+        throw [System.PlatformNotSupportedException]::new('Start-KeepAlive requires Windows.')
+    }
     $wshell = New-Object -ComObject wscript.shell
     do
     {

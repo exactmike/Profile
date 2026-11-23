@@ -16,7 +16,9 @@ function Start-SelectedApp
 
     begin
     {
-
+        if (-not $IsWindows) {
+            throw [System.PlatformNotSupportedException]::new('Start-SelectedApp requires Windows.')
+        }
     }
 
     process

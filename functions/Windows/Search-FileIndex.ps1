@@ -37,6 +37,9 @@ function Search-FileIndex
         [Parameter(Mandatory = $false)]
         [switch]$AsFSInfo = $false
     )
+    if (-not $IsWindows) {
+        throw [System.PlatformNotSupportedException]::new('Search-FileIndex requires Windows.')
+    }
     if ($Path -eq "")
     {
         $Path = $PWD;

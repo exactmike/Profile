@@ -25,6 +25,9 @@
         ,
         [switch]$ReturnChoice
     )
+    if (-not $IsWindows) {
+        throw [System.PlatformNotSupportedException]::new('Read-Choice requires Windows.')
+    }
     #Region ProcessChoices
     #Prepare the PossibleChoices objects
     switch ($PSCmdlet.ParameterSetName)

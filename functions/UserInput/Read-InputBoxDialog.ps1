@@ -9,6 +9,9 @@
         ,
         [string]$DefaultText
     )
+    if (-not $IsWindows) {
+        throw [System.PlatformNotSupportedException]::new('Read-InputBoxDialog requires Windows.')
+    }
 
     $Script:UserInput = $null
     #Region BuildWPFWindow
