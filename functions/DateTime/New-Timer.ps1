@@ -1,6 +1,5 @@
 ﻿Function New-Timer
 {
-    #Requires -module OutSpeech
     <#
       .Synopsis
       Creates a new countdown timer which can show progress and/or issue speech$Speech reports of remaining time.
@@ -54,6 +53,13 @@
 
     if ($Speech)
     {
+        # Checked here instead of with #Requires so that the module loads without OutSpeech (for example on Linux).
+        if (-not (Get-Module -Name 'OutSpeech' -ListAvailable)) {
+            throw [System.Management.Automation.CommandNotFoundException]::new(
+                'New-Timer -Speech requires the OutSpeech module, which is not installed.'
+            )
+        }
+
         if ($null -eq $script:TimerSpeechConfigured)
         {
             Write-Verbose -Message 'Configuring Timer Speech'
